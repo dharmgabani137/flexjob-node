@@ -9,7 +9,7 @@ var MongoDBStore = require('connect-mongodb-session')(session);
 
 const app = express();
 
-const dbUrl = 'mongodb://localhost:27017/user';
+const dbUrl = 'mongodb://127.0.0.1:27017/user';
 
 mongoose.connect(dbUrl,{useNewUrlParser : true,useUnifiedTopology : true});
 
@@ -33,7 +33,7 @@ app.use('/', route);
 
 
 
-app.listen(3000, e => {
+app.listen(4000, e => {
     console.log('server is running');
 })
 
