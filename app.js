@@ -1,0 +1,39 @@
+const express = require('express');
+const bodyParser = require("body-parser")
+const { route } = require('./router')
+const mongoose = require('mongoose');
+const session = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(session);
+
+
+
+const app = express();
+
+const dbUrl = 'mongodb://localhost:27017/user';
+
+mongoose.connect(dbUrl,{useNewUrlParser : true,useUnifiedTopology : true});
+
+app.use(session({
+    secret: 'SECRET KEY',
+    resave: true,
+    saveUninitialized: true,
+    store: new MongoDBStore({
+        uri: dbUrl, //YOUR MONGODB URL
+        collection: 'session'
+    }),
+    cookie:{
+        maxAge : 1000 * 60 * 60 * 24 * 6
+    }
+})) 
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use('/', route);
+
+
+
+
+app.listen(3000, e => {
+    console.log('server is running');
+})
+
