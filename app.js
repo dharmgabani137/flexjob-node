@@ -4,7 +4,7 @@ const { route } = require('./router')
 const mongoose = require('mongoose');
 const session = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
-
+var cors = require('cors')
 
 
 const app = express();
@@ -12,6 +12,8 @@ const app = express();
 const dbUrl = 'mongodb://127.0.0.1:27017/user';
 
 mongoose.connect(dbUrl,{useNewUrlParser : true,useUnifiedTopology : true});
+
+app.use(cors())
 
 app.use(session({
     secret: 'SECRET KEY',
