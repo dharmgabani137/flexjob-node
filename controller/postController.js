@@ -1,6 +1,7 @@
 const expertiseModel = require('../models/expertiseModels');
 const PostModel = require('../models/postModels');
 const joi = require('joi');
+const moment = require('moment')
 
 async function post(req, res) {
 
@@ -89,15 +90,19 @@ async function postList(req, res) {
 
     var { docs, total, limit, page, pages } = await PostModel.paginate({}, { page: pageNumber, limit: limit });
 
-    var newD = await Promise.all(docs.map(async (v) => {
-        v.expertise = await expertiseModel.find({
+    var newD = await Promise.all(docs.map(async (v) => ({
+        ...v._doc, formattedTime: moment(v.createdAt).fromNow(), //spread
+        expertise: await expertiseModel.find({
             _id: { $in: v.expertise }
         })
-        return v
-    }))
-
-    console.log(newD);
-    res.json({ users: newD, total, limit, page, pages });
+    })))      
+    res.json({
+        users: newD,
+        total,
+        limit,
+        page,
+        pages,
+    });
 }
 
 

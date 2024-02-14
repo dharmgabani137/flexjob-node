@@ -55,7 +55,6 @@ async function registerPost(req, res) {
             location: data.location,
             savedJob: data.savedJob,
             rate: data.rate,
-
         })
 
         res.json({
@@ -73,12 +72,16 @@ async function registerPost(req, res) {
 }
 
 async function login(req, res) {
+
+    // console.log(req.headers, 'req');
+    // console.log(res.headers, 'res');
+
     var data = req.body;
     var user = await UserModel.findOne({ email: data.email });
 
 
     if (user == null) {
-        res.json({
+        return res.json({
             status: false,
             message: 'invalid emailId'
         })
@@ -224,12 +227,12 @@ async function resetPass(req, res) {
         const user = await UserModel.findById(req.params.userid);
         console.log(user);
         if (!user) return res.status(400).send("invalid link or expired");
-        console.log(user,'user');
+        console.log(user, 'user');
         const token = await tokenModel.findOne({
             userId: user._id,
-            token: req.params.token,    
+            token: req.params.token,
         });
-        console.log(token,'token');
+        console.log(token, 'token');
         if (!token) return res.status(400).send("Invalid link or expired");
 
         user.password = req.body.password;
