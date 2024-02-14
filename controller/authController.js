@@ -19,7 +19,7 @@ async function registerPost(req, res) {
         password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
         mobile: joi.string().regex(/^[0-9]{10}$/),
         expertise: joi.array().required(),
-        language: joi.array().required(),
+        // language: joi.array().required(),
         title: joi.string().required(),
         description: joi.string().required(),
         workHistory: joi.array().required(),
