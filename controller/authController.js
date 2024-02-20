@@ -23,7 +23,7 @@ async function registerPost(req, res) {
         type: joi.string().required(),
         firstName: joi.string().alphanum().min(3).max(30).required(),
         lastName: joi.string().alphanum().min(3).max(30).required(),
-        email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
+        email: joi.string().email(),
         password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
         mobile: joi.string().regex(/^[0-9]{10}$/),
         expertise: joi.array().required(),
@@ -36,6 +36,7 @@ async function registerPost(req, res) {
         rate: joi.string().required()
     });
 
+    const hashedPassword = await bcrypt.hash(data.password, 10);
     var valid = schema.validate(data);
 
 

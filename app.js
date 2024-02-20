@@ -27,7 +27,7 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24 * 6
     }
 }))
-
+ 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
