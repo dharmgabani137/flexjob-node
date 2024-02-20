@@ -10,7 +10,6 @@ const crypto = require('crypto');
 
 async function registerPost(req, res) {
     var data = req.body;
-    const hashedPassword = await bcrypt.hash(data.password, 10);
     // Check if the 'password' field is present in the request data
     if (!data.password) {
         return res.json({
