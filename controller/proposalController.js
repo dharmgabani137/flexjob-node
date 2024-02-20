@@ -29,7 +29,7 @@ async function proposal(req, res) {
 async function proposalUpdate(req, res) {
     var data = req.body;
     const schema = joi.object().keys({
-        id : joi.string().required(),
+        id: joi.string().required(),
         description: joi.string().required(),
         postId: joi.string().required(),
         userId: joi.string().required(),
@@ -43,68 +43,67 @@ async function proposalUpdate(req, res) {
             error: valid.error.message
         })
     }
-    
-    var user = await ProposalModel.updateOne({},{postId :  data.postId , userId : data.userId , description : data.description , bidAmount : data.bidAmount,status : data.status});
-    if(user.modifiedCount == 0){
+
+    var user = await ProposalModel.updateOne({}, { postId: data.postId, userId: data.userId, description: data.description, bidAmount: data.bidAmount, status: data.status });
+    if (user.modifiedCount == 0) {
         res.json({
-            status : true,
-            message : "updated not successfully"
-        })     
+            status: true,
+            message: "updated not successfully"
+        })
     }
-    else{
+    else {
         res.json({
-            status : true,
-            message : "updated successfully"
+            status: true,
+            message: "updated successfully"
         })
     }
 
-    
+
 }
 
 
-async function proposalByPost(req,res) {
-    let id = req.query.postId;
-    var post = await ProposalModel.find({postId : id})
-    .populate("userId");
-
-    const pageNumber = req.query.page || 1; // Get the current page number from the query parameters
-    const limit = req.query.limit || 5;
-     // Number of items per page
-
-
-    ProposalModel.paginate({}, { page: pageNumber, limit: limit }, (err, result) => {
-        if (err) {
-            return res.status(500).json({ message: 'Error occurred while fetching users.' });
-        }
-
-        const { docs, total, limit, page, pages } = result;
-        res.json({ users: docs, total, limit, page, pages });
-    });
-
-
-    // res.json ({ 
-    //     postData : post,
-    //     status : true,
-    //     message : "record fetch successfully"
-    // })
+async function proposalByPost(req, res) {
+    try { 
+        // Adding Pagination 
+        const limitValue = req.query.limit || 2; 
+        const skipValue = req.query.skip || 0; 
+        const posts = await PostModel.find() 
+            .limit(limitValue).skip(skipValue); 
+        res.status(200).send(posts); 
+    } catch (e) { 
+        console.log(e); 
+    } 
 }
 
-async function proposalAcceptReject(req,res) {
-        var data  = req.body;
-        var user = await ProposalModel.updateOne({ _id : data.id} , {status : data.status});
+async function proposalAcceptReject(req, res) {
+    var data = req.body;
+    var user = await ProposalModel.updateOne({ _id: data.id }, { status: data.status });
 
-        if(user.modifiedCount == 0){
-            res.json({
-                status : true,
-                message : "status dose not updated"
-            })
-        }
-        else{
-            res.json({
-                status : true,
-                message : "status updated successfully"
-            })
-        }
+    if (user.modifiedCount == 0) {
+        res.json({
+            status: true,
+            message: "status dose not updated"
+        })
+    }
+    else {
+        res.json({
+            status: true,
+            message: "status updated successfully"
+        })
+    }
+}
+
+
+async function proposalByUser(req, res) {
+    var id = req.body.userId;
+    console.log(id, 'id');
+    var user = await PostModel.find({ userId: id })
+
+    res.json({
+        data: user,
+        message: "data fetched successfully",
+
+    })
 }
 
 
@@ -113,5 +112,6 @@ module.exports = {
     proposal,
     proposalUpdate,
     proposalByPost,
-    proposalAcceptReject
+    proposalAcceptReject,
+    proposalByUser
 }

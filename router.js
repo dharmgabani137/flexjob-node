@@ -1,8 +1,9 @@
 const express = require('express');
+const jwt = require("jsonwebtoken");
 // const multer = require('multer');
-const { registerPost, login, logout, update, getRequest, forgetPass , sendEmail , resetPass} = require('./controller/authController');
+const { registerPost, login, logout, update, getRequest, forgetPass, sendEmail, resetPass } = require('./controller/authController');
 const { post, postUpdate, postDelete, postList } = require('./controller/postController');
-const { proposal, proposalUpdate, proposalByPost, proposalAcceptReject } = require('./controller/proposalController');
+const { proposal, proposalUpdate, proposalByPost, proposalAcceptReject, proposalByUser } = require('./controller/proposalController');
 const { employeeData } = require('./controller/employeeController');
 const { employerData } = require('./controller/employerController');
 const { seedData, expertiseData } = require('./controller/expertiseController');
@@ -22,16 +23,29 @@ const route = express.Router();
 //     })
 // });
 
+// function verify(req, res, next) {
+//     if (req.session?.user) {
+//         return next()
+//     } else {
+//         res.json({
+//             status: false,
+//             message: "Unauthenticated."
+//         })
+//     }
+// }
+
+
 function verify(req, res, next) {
-    if (req.session?.user) {
-        return next()
-    } else {
-        res.json({
-            status: false,
-            message: "Unauthenticated."
-        })
+    try {
+        const token = req.headers.authorization.split(" ")[1];
+        req.payload = jwt.verify(token, "your_secret_key");
+        next();
+    } catch (error) {
+        res.status(401).json({ message: "No token provided" });
     }
 }
+
+
 
 
 route.post('/register', registerPost);
@@ -50,10 +64,11 @@ route.get('/post-list', postList);
 route.get('/employee-data', employeeData);
 route.get('/employer-data', employerData);
 route.get('/seed-expertise', seedData);
-route.get('/expertise-data',expertiseData);
+route.get('/expertise-data', expertiseData);
 route.post('/send-email', sendEmail);
-route.post('/forget-pass',forgetPass);
+route.post('/forget-pass', forgetPass);
 route.post('/reset/:userid/:token', resetPass);
+route.get('proposal-by-user', proposalByUser)
 
 
 // change kkkk

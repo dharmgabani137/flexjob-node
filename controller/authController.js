@@ -1,15 +1,23 @@
 const UserModel = require("../models/userModels");
 const tokenModel = require("../models/tokenModel");
+const loginModel = require("../models/loginModel");
+const jwt = require('jsonwebtoken');
 const joi = require('joi');
 const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
 const crypto = require('crypto');
 
 
-
 async function registerPost(req, res) {
     var data = req.body;
     const hashedPassword = await bcrypt.hash(data.password, 10);
+    // Check if the 'password' field is present in the request data
+    if (!data.password) {
+        return res.json({
+            status: false,
+            message: 'Password is required'
+        });
+    }
 
     const schema = joi.object().keys({
         type: joi.string().required(),
@@ -48,7 +56,7 @@ async function registerPost(req, res) {
             password: hashedPassword,
             mobile: data.mobile,
             expertise: data.expertise,
-            language: data.language,
+            // language: data.language,
             title: data.title,
             description: data.description,
             workHistory: data.workHistory,
@@ -56,6 +64,7 @@ async function registerPost(req, res) {
             savedJob: data.savedJob,
             rate: data.rate,
         })
+        console.log(checkEmail, 'cc')
 
         res.json({
             status: true,
@@ -72,10 +81,6 @@ async function registerPost(req, res) {
 }
 
 async function login(req, res) {
-
-    // console.log(req.headers, 'req');
-    // console.log(res.headers, 'res');
-
     var data = req.body;
     var user = await UserModel.findOne({ email: data.email });
 
@@ -88,11 +93,17 @@ async function login(req, res) {
     }
     const passwordMatch = await bcrypt.compare(data.password, user.password);
 
+
     if (passwordMatch) {
-        req.session.user = user;
-        console.log("session-user", req.session.user);
+
+        const token = jwt.sign({
+            _id: user._id,
+            email: user.email
+        }, 'your_secret_key', { expiresIn: '1h' });
+        await loginModel.create({ userId: user._id, token: token })
         return res.json({
             status: true,
+            token: token,
             message: 'Login successful'
         });
 
@@ -114,8 +125,11 @@ function logout(req, res) {
 }
 
 async function getRequest(req, res) {
-    var currentUser = req.session.user;
-    var user = await UserModel.findOne({ _id: currentUser._id }, { 'firstName': 1, 'lastName': 1, 'email': 1, 'mobile': 1, 'expertise': 1, 'language': 1, 'title': 1, 'description': 1, 'workHistory': 1, 'location': 1, 'savedJob': 1, 'rate': 1 });
+
+    console.log(req.payload, 'gfggfgfggf');
+
+    // var currentUser = req.session.user;
+    var user = await UserModel.findOne({ _id: req.payload._id }, { 'firstName': 1, 'lastName': 1, 'email': 1, 'mobile': 1, 'expertise': 1, 'language': 1, 'title': 1, 'description': 1, 'workHistory': 1, 'location': 1, 'savedJob': 1, 'rate': 1 });
     res.json({
         userData: user
     })

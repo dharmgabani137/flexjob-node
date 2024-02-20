@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const mongoosePaginate = require('mongoose-paginate-v2');
+const aggregatePaginate = require('mongoose-aggregate-paginate-v2');
 
 var proposalSchema = new mongoose.Schema({
     postId : {
@@ -25,6 +25,6 @@ var proposalSchema = new mongoose.Schema({
         require : true
     }
 })
-proposalSchema.plugin(mongoosePaginate);
+proposalSchema.plugin(aggregatePaginate);
 const ProposalModel = mongoose.model('proposal' , proposalSchema)
 module.exports = ProposalModel;
