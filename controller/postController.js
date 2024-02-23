@@ -39,7 +39,6 @@ async function postUpdate(req, res) {
         title: joi.string().min(3).max(10).required(),
         expertise: joi.array().required(),
         budget: joi.number().required(),
-        status: joi.string().required()
 
     })
     var valid = schema.validate(data)
@@ -48,7 +47,7 @@ async function postUpdate(req, res) {
             error: valid.error.message
         })
     }
-    var user = await PostModel.updateOne({ _id: data.id }, { userId: data.userId, budget: data.budget, status: data.status });
+    var user = await PostModel.updateOne({ _id: data.id }, { userId: data.userId, budget: data.budget, status: "pending" });
     if (user.modifiedCount == 0) {
         res.json({
             status: false,
