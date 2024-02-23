@@ -2,12 +2,13 @@ const express = require('express');
 const jwt = require("jsonwebtoken");
 const loginModel = require("./models/loginModel");
 // const multer = require('multer');
-const { registerPost, login, logout, update, getRequest, forgetPass, sendEmail, resetPass } = require('./controller/authController');
+const { registerPost, login, logout, update, profile, forgetPass, sendEmail, resetPass } = require('./controller/authController');
 const { post, postUpdate, postDelete, postList , likePost, savePost} = require('./controller/postController');
 const { proposal, proposalUpdate, proposalByPost, proposalAcceptReject, proposalByUser } = require('./controller/proposalController');
 const { employeeData } = require('./controller/employeeController');
 const { employerData } = require('./controller/employerController');
 const { seedData, expertiseData } = require('./controller/expertiseController');
+
 
 const route = express.Router();
 
@@ -66,7 +67,7 @@ route.post('/register', registerPost);
 route.post('/login', login);
 route.post('/logout', logout);
 route.post('/profile-update', verify, update);
-route.get('/profile', verify, getRequest);
+route.get('/profile', verify, profile);
 route.post('/post', verify, post);
 route.post('/post-update', verify, postUpdate);
 route.post('/delete', verify, postDelete);

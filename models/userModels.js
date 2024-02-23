@@ -27,7 +27,7 @@ var userSchema = new mongoose.Schema({
         require : true
     },
     mobile : {
-        type : Number,
+        type : String,
         require : true
     },
     expertise : {

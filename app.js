@@ -4,15 +4,10 @@ const { route } = require('./router')
 const mongoose = require('mongoose');
 const session = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
-const cors = require("cors")
-
-
+const cors = require("cors");
+const fileUpload = require('express-fileupload');
 const app = express();
-
 const dbUrl = 'mongodb://127.0.0.1:27017/user';
-
-
-
 mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(session({
@@ -27,12 +22,20 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24 * 6
     }
 }))
- 
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+
 app.use(cors({
+    origin: "*",
     credentials: true,
+}));
+
+
+app.use(fileUpload({
+    useTempFiles: true,
+    tempFileDir: '/public/img/'
 }));
 app.use('/', route);
 

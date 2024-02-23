@@ -9,6 +9,7 @@ const crypto = require('crypto');
 
 
 
+
 async function registerPost(req, res) {
     var data = req.body;
     // Check if the 'password' field is present in the request data
@@ -20,20 +21,20 @@ async function registerPost(req, res) {
     }
 
     const schema = joi.object().keys({
-        type: joi.string().required(),
-        firstName: joi.string().alphanum().min(3).max(30).required(),
-        lastName: joi.string().alphanum().min(3).max(30).required(),
+        type: joi.string(),
+        firstName: joi.string().alphanum().min(3).max(30),
+        lastName: joi.string().alphanum().min(3).max(30),
         email: joi.string().email(),
         password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
         mobile: joi.string().regex(/^[0-9]{10}$/),
-        expertise: joi.array().required(),
+        expertise: joi.array(),
         // language: joi.array().required(),
-        title: joi.string().required(),
-        description: joi.string().required(),
-        workHistory: joi.array().required(),
-        location: joi.string().required(),
-        savedJob: joi.array().required(),
-        rate: joi.string().required()
+        title: joi.string(),
+        description: joi.string(),
+        workHistory: joi.array(),
+        location: joi.string(),
+        savedJob: joi.array(),
+        rate: joi.string()
     });
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -141,7 +142,7 @@ async function logout(req, res) {
     }
 }
 
-async function getRequest(req, res) {
+async function profile(req, res) {
 
     // var currentUser = req.session.user;
     var user = await UserModel.findOne({ _id: req.payload._id }, { 'firstName': 1, 'lastName': 1, 'email': 1, 'mobile': 1, 'expertise': 1, 'language': 1, 'title': 1, 'description': 1, 'workHistory': 1, 'location': 1, 'savedJob': 1, 'rate': 1 });
@@ -153,28 +154,40 @@ async function getRequest(req, res) {
 async function update(req, res) {
     const userId = req.payload._id;
     var data = req.body;
-
+    console.log(data);
     const schema = joi.object().keys({
-        type: joi.string().required(),
-        firstName: joi.string().alphanum().min(3).max(30).required(),
-        lastName: joi.string().alphanum().min(3).max(30).required(),
+        firstName: joi.string().alphanum().min(3).max(30),
+        lastName: joi.string().alphanum().min(3).max(30),
         email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
         password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
         mobile: joi.string().regex(/^[0-9]{10}$/),
-        expertise: joi.array().required(),
-        language: joi.array().required(),
-        title: joi.string().required(),
-        description: joi.string().required(),
-        workHistory: joi.array().required(),
-        location: joi.string().required(),
-        savedJob: joi.array().required(),
-        rate: joi.string().required()
+        expertise: joi.array(),
+        title: joi.string(),
+        description: joi.string(),
+        workHistory: joi.array(),
+        location: joi.string(),
+        savedJob: joi.array(),
+        rate: joi.string()
     });
+
 
     var valid = schema.validate(data);
 
+        //     return res.status(400).json({ message: 'No files were uploaded.' });
+    // }
+
+    // The name of the input field (e.g. "avatar") is used to retrieve the uploaded file
+    let uploadedFile = req.files.image;
+
+    // Use the mv() method to place the file somewhere on your server
+    uploadedFile.mv('./public/img/' + uploadedFile.name, function(err) {
+        if (err) return res.status(500).send(err);
+        // File uploaded successfully
+        console.log('File uploaded!');
+    });
+
     if (valid?.error) {
-        return res.json({
+        return res.json({   
             error: valid.error.message
         })
     }
@@ -279,7 +292,7 @@ module.exports = {
     registerPost,
     login,
     logout,
-    getRequest,
+    profile,
     update,
     sendEmail,
     forgetPass,
