@@ -8,6 +8,7 @@ const nodemailer = require("nodemailer");
 const crypto = require('crypto');
 
 
+
 async function registerPost(req, res) {
     var data = req.body;
     // Check if the 'password' field is present in the request data
@@ -99,7 +100,7 @@ async function login(req, res) {
         const token = jwt.sign({
             _id: user._id,
             email: user.email
-        }, 'your_secret_key', { expiresIn: '1h' });
+        }, 'your_secret_key', { expiresIn: '1d' });
         await loginModel.create({ userId: user._id, token: token })
         return res.json({
             status: true,
@@ -116,17 +117,31 @@ async function login(req, res) {
     }
 }
 
-function logout(req, res) {
-    req.session.user = null;
-    res.json({
-        status: true,
-        message: 'logout successfully'
-    })
+// function logout(req, res) {
+//     req.session.user = null;
+//     res.json({
+//         status: true,
+//         message: 'logout successfully'
+//     })
+// }
+async function logout(req, res) {
+    try {
+        const token = req.headers.authorization.split(" ")[1]; // Extract token from headers
+        await loginModel.deleteOne({ token }); // Delete the token from the database
+        res.json({
+            status: true,
+            message: 'Logout successfully'
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            status: false,
+            message: 'Internal server error'
+        });
+    }
 }
 
 async function getRequest(req, res) {
-
-    console.log(req.payload, 'gfggfgfggf');
 
     // var currentUser = req.session.user;
     var user = await UserModel.findOne({ _id: req.payload._id }, { 'firstName': 1, 'lastName': 1, 'email': 1, 'mobile': 1, 'expertise': 1, 'language': 1, 'title': 1, 'description': 1, 'workHistory': 1, 'location': 1, 'savedJob': 1, 'rate': 1 });
@@ -136,7 +151,7 @@ async function getRequest(req, res) {
 }
 
 async function update(req, res) {
-    const userId = req.session.user._id;
+    const userId = req.payload._id;
     var data = req.body;
 
     const schema = joi.object().keys({
