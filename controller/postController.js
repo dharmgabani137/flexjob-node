@@ -9,7 +9,7 @@ async function post(req, res) {
 
     var data = req.body;
     const schema = joi.object().keys({
-        userId: joi.string().required(),
+        // userId: joi.string().required(),
         description: joi.string().alphanum().min(10).max(1000).required(),
         title: joi.string().min(3).required(),
         expertise: joi.array().required(),
@@ -23,7 +23,7 @@ async function post(req, res) {
             error: valid.error.message
         })
     }
-    var user = await PostModel.create({ userId: data.userId, description: data.description, title: data.title, expertise: data.expertise, budget: data.budget, status: data.status });
+    var user = await PostModel.create({ userId: req.payload.user._id, description: data.description, title: data.title, expertise: data.expertise, budget: data.budget, status: data.status });
     res.json({
         status: true,
         message: "created successfully"
