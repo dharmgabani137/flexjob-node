@@ -14,7 +14,6 @@ async function post(req, res) {
         title: joi.string().min(3).required(),
         expertise: joi.array().required(),
         budget: joi.number().required(),
-        status: joi.string().required()
     })
 
     var valid = schema.validate(data)
@@ -23,7 +22,7 @@ async function post(req, res) {
             error: valid.error.message
         })
     }
-    var user = await PostModel.create({ userId: req.payload.user._id, description: data.description, title: data.title, expertise: data.expertise, budget: data.budget, status: data.status });
+    var user = await PostModel.create({ userId: req.payload.user._id, description: data.description, title: data.title, expertise: data.expertise, budget: data.budget, status: "pending" });
     res.json({
         status: true,
         message: "created successfully"
