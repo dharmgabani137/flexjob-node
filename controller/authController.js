@@ -181,7 +181,7 @@ async function update(req, res) {
 
     // Use the mv() method to place the file somewhere on your server
     uploadedFile.mv('./public/img/' + uploadedFile.files, function(err) {
-        console.log(uploadedFile.mimetype);
+        console.log(uploadedFile);
         if (err) return res.status(500).send(err);
         // File uploaded successfully
     });

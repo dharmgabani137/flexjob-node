@@ -14,8 +14,9 @@ async function post(req, res) {
         title: joi.string().min(3),
         expertise: joi.array(),
         budget: joi.number(),
+        status : joi.string()
     })
-
+ 
     var valid = schema.validate(data)
     if (valid?.error) {
         return res.json({
