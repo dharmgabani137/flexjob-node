@@ -5,11 +5,11 @@ const joi = require('joi');
 async function proposal(req, res) {
     var data = req.body;
     const schema = joi.object().keys({
-        postId: joi.string().required(),
-        userId: joi.string().required(),
-        description: joi.string().required(),
-        bidAmount: joi.number().required(),
-
+        postId: joi.string(),
+        userId: joi.string(),
+        description: joi.string(),
+        bidAmount: joi.number(),
+        status: joi.string()
     })
     var valid = schema.validate(data);
 
@@ -19,7 +19,7 @@ async function proposal(req, res) {
             error: valid.error.message
         })
     }
-    var user = await ProposalModel.create({ postId: data.postId, userId: data.userId, description: data.description, bidAmount: data.bidAmount, status: 'pending'});
+    var user = await ProposalModel.create({ postId: data.postId, userId: data.userId, description: data.description, bidAmount: data.bidAmount, status: data.status});
 
     res.json({
         status: true,
@@ -29,12 +29,12 @@ async function proposal(req, res) {
 async function proposalUpdate(req, res) {
     var data = req.body;
     const schema = joi.object().keys({
-        id: joi.string().required(),
-        description: joi.string().required(),
-        postId: joi.string().required(),
-        userId: joi.string().required(),
-        bidAmount: joi.number().required(),
-        status: joi.string().required()
+        id: joi.string(),
+        description: joi.string(),
+        postId: joi.string(),
+        userId: joi.string(),
+        bidAmount: joi.number(),
+        status: joi.string()
     })
     var valid = schema.validate(data);
     if (valid?.error) {

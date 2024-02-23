@@ -10,10 +10,10 @@ async function post(req, res) {
     var data = req.body;
     const schema = joi.object().keys({
         // userId: joi.string().required(),
-        description: joi.string().alphanum().min(10).max(1000).required(),
-        title: joi.string().min(3).required(),
-        expertise: joi.array().required(),
-        budget: joi.number().required(),
+        description: joi.string().alphanum().min(10).max(1000),
+        title: joi.string().min(3),
+        expertise: joi.array(),
+        budget: joi.number(),
     })
 
     var valid = schema.validate(data)
@@ -32,12 +32,13 @@ async function post(req, res) {
 async function postUpdate(req, res) {
     var data = req.body;
     const schema = joi.object().keys({
-        id: joi.string().required(),
-        userId: joi.string().required(),
-        description: joi.string().alphanum().min(10).max(1000).required(),
-        title: joi.string().min(3).max(10).required(),
-        expertise: joi.array().required(),
-        budget: joi.number().required(),
+        id: joi.string(),
+        userId: joi.string(),
+        description: joi.string().alphanum().min(10).max(1000),
+        title: joi.string().min(3).max(10),
+        expertise: joi.array(),
+        budget: joi.number(),
+        status: joi.string(),
 
     })
     var valid = schema.validate(data)
@@ -46,7 +47,7 @@ async function postUpdate(req, res) {
             error: valid.error.message
         })
     }
-    var user = await PostModel.updateOne({ _id: data.id }, { userId: data.userId, budget: data.budget, status: "pending" });
+    var user = await PostModel.updateOne({ _id: data.id }, { userId: data.userId, budget: data.budget, status: data.status });
     if (user.modifiedCount == 0) {
         res.json({
             status: false,
