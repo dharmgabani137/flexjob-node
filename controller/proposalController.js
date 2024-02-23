@@ -9,7 +9,7 @@ async function proposal(req, res) {
         userId: joi.string().required(),
         description: joi.string().required(),
         bidAmount: joi.number().required(),
-        status: joi.string().required()
+
     })
     var valid = schema.validate(data);
 
@@ -19,7 +19,7 @@ async function proposal(req, res) {
             error: valid.error.message
         })
     }
-    var user = await ProposalModel.create({ postId: data.postId, userId: data.userId, description: data.description, bidAmount: data.bidAmount, status: data.status });
+    var user = await ProposalModel.create({ postId: data.postId, userId: data.userId, description: data.description, bidAmount: data.bidAmount, status: 'pending'});
 
     res.json({
         status: true,
