@@ -23,7 +23,7 @@ async function post(req, res) {
             error: valid.error.message
         })
     }
-    var user = await PostModel.create({ userId: req.payload.user._id, description: data.description, title: data.title, expertise: data.expertise, budget: data.budget, status: data.status});
+    var user = await PostModel.create({ userId: req.payload._id, description: data.description, title: data.title, expertise: data.expertise, budget: data.budget, status: data.status});
     res.json({
         status: true,
         message: "created successfully"
