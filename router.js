@@ -8,6 +8,7 @@ const { proposal, proposalUpdate, proposalByPost, proposalAcceptReject, proposal
 const { employeeData } = require('./controller/employeeController');
 const { employerData } = require('./controller/employerController');
 const { seedData, expertiseData } = require('./controller/expertiseController');
+const { reviews } = require('./controller/reviewsController');
 
 
 const route = express.Router();
@@ -65,7 +66,7 @@ async function verify(req, res, next) {
 
 route.post('/register', registerPost);
 route.post('/login', login);
-route.post('/logout', logout);
+route.post('/logout', logout);  
 route.post('/profile-update', verify, update);
 route.get('/profile', verify, profile);
 route.post('/post', verify, post);
@@ -86,6 +87,7 @@ route.post('/reset/:userid/:token', resetPass);
 route.get('proposal-by-user', proposalByUser);
 route.post('/like', verify,likePost);
 route.post('/save-post',verify,savePost);
+route.post('/reviews',verify,reviews)
 
 
 // change kkkk

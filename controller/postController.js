@@ -1,4 +1,4 @@
-const expertiseModel = require('../models/expertiseModels');
+const expertiseModel = require('../models/expertiseModel');
 const PostModel = require('../models/postModels');
 const joi = require('joi');
 const moment = require('moment');
@@ -10,11 +10,11 @@ async function post(req, res) {
     var data = req.body;
     const schema = joi.object().keys({
         // userId: joi.string().required(),
-        description: joi.string().alphanum().min(10).max(1000),
-        title: joi.string().min(3),
-        expertise: joi.array(),
-        budget: joi.number(),
-        status : joi.string()
+        description: joi.string().alphanum().min(10).max(1000).required(),
+        title: joi.string().min(3).required(),
+        expertise: joi.array().required(),
+        budget: joi.number().required(),
+        status : joi.string().required()
     })
  
     var valid = schema.validate(data)

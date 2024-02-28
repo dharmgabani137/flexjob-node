@@ -6,6 +6,8 @@ const joi = require('joi');
 const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
 const crypto = require('crypto');
+var fs = require('fs');
+
 
 
 
@@ -86,7 +88,6 @@ async function login(req, res) {
     var data = req.body;
     var user = await UserModel.findOne({ email: data.email });
 
-
     if (user == null) {
         return res.json({
             status: false,
@@ -94,15 +95,28 @@ async function login(req, res) {
         })
     }
     const passwordMatch = await bcrypt.compare(data.password, user.password);
+    console.log(passwordMatch);
 
 
     if (passwordMatch) {
 
         const token = jwt.sign({
             _id: user._id,
-            email: user.email
-        }, 'your_secret_key', { expiresIn: '1d' });
-        await loginModel.create({ userId: user._id, token: token })
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            password: user.Password,
+            mobile: user.mobile,
+            expertise: user.expertise,
+            title: user.title,
+            description: user.description,
+            workHistory: user.workHistory,
+            location: user.location,
+            savedJob: user.savedJob,
+            rate: user.rate,
+
+        }, 'your_secret_key', { expiresIn: '1w' });
+        await loginModel.create({ userId: user._id, token: token });
         return res.json({
             status: true,
             token: token,
@@ -145,9 +159,12 @@ async function logout(req, res) {
 async function profile(req, res) {
 
     // var currentUser = req.session.user;
-    var user = await UserModel.findOne({ _id: req.payload._id }, { 'firstName': 1, 'lastName': 1, 'email': 1, 'mobile': 1, 'expertise': 1, 'language': 1, 'title': 1, 'description': 1, 'workHistory': 1, 'location': 1, 'savedJob': 1, 'rate': 1 });
+    var user = await UserModel.findOne({ _id: req.payload._id }, { 'firstName': 1, 'lastName': 1, 'email': 1, 'mobile': 1, 'expertise': 1, 'language': 1, 'title': 1, 'description': 1, 'workHistory': 1, 'location': 1, 'savedJob': 1, 'rate': 1,'img':1 });
+    var createLink = "http://127.0.0.1:4000" + user.img;
+
     res.json({
-        userData: user
+        userData: user,
+        link : createLink
     })
 }
 
@@ -158,7 +175,7 @@ async function update(req, res) {
     const schema = joi.object().keys({
         firstName: joi.string().alphanum().min(3).max(30),
         lastName: joi.string().alphanum().min(3).max(30),
-        email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
+        // email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
         password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
         mobile: joi.string().regex(/^[0-9]{10}$/),
         expertise: joi.array(),
@@ -169,29 +186,49 @@ async function update(req, res) {
         savedJob: joi.array(),
         rate: joi.string()
     });
-
-
     var valid = schema.validate(data);
-
-        //     return res.status(400).json({ message: 'No files were uploaded.' });
-    // }
-
-    // The name of the input field (e.g. "avatar") is used to retrieve the uploaded file
-    let uploadedFile = req.files.image;
-
-    // Use the mv() method to place the file somewhere on your server
-    uploadedFile.mv('./public/img/' + uploadedFile.files, function(err) {
-        console.log(uploadedFile);
-        if (err) return res.status(500).send(err);
-        // File uploaded successfully
-    });
-
     if (valid?.error) {
-        return res.json({   
+        return res.json({
             error: valid.error.message
         })
     }
-    var user1 = await UserModel.updateOne({ _id: userId }, { type: data.type, firstName: data.firstName, lastName: data.lastName, email: data.email, password: data.password, mobile: data.mobile, expertise: data.expertise, language: data.language, title: data.title, description: data.description, workHistory: data.workHistory, location: data.location, savedJob: data.savedJob, rate: data.rate });
+
+    //     return res.status(400).json({ message: 'No files were uploaded.' });
+    // }
+
+    // The name of the input field (e.g. "avatar") is used to retrieve the uploaded file
+
+
+
+    if (req.files.image) {
+        let uploadedFile = req.files.image;
+        {
+            var img = '/img/' + req.payload.firstName + new Date().getTime() + "." + uploadedFile.mimetype.slice(6)
+
+            // Use the mv() method to place the file somewhere on your server'
+            uploadedFile.mv('./public' + img, function (err) {
+                if (err) return res.status(500).send(err);
+                // File uploaded successfully
+            });
+            data.img = img
+        }
+        var findUser = await UserModel.findOne({ _id: req.payload._id });
+        if (findUser.img) {
+            fs.unlink('./public' + findUser.img, (err) => {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                console.log('File deleted successfully');
+            });
+        }
+    }
+
+
+
+
+
+    var user1 = await UserModel.updateOne({ _id: userId }, data);
 
 
     if (user1.modifiedCount == 0) {
@@ -245,7 +282,7 @@ async function forgetPass(req, res) {
             }).save();
         }
 
-        const link = `http://127.0.0.1:3000/reset/${user._id}/${token.token}`;
+        const link = `http://127.0.0.1:4000/reset/${user._id}/${token.token}`;
         await sendEmail(user.email, "Password reset", link);
 
         res.json({
@@ -277,7 +314,8 @@ async function resetPass(req, res) {
         console.log(token, 'token');
         if (!token) return res.status(400).send("Invalid link or expired");
 
-        user.password = req.body.password;
+        const hashedPassword = await bcrypt.hash(user.password, 10);    
+        user.password = hashedPassword;
         await user.save();
         // await token.delete();
 
@@ -286,7 +324,7 @@ async function resetPass(req, res) {
         res.send("An error occured");
         console.log(error);
     }
-}
+}   
 
 module.exports = {
     registerPost,

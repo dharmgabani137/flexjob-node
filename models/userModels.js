@@ -61,6 +61,10 @@ var userSchema = new mongoose.Schema({
     rate : {
         type : Number,
         require : true
+    },
+    img : {
+        type : String,
+        require : true
     }
 })
 userSchema.plugin(mongoosePaginate);

@@ -1,4 +1,4 @@
-const expertiseModel = require('../models/expertiseModels');
+const expertiseModel = require('../models/expertiseModel');
 
 // Define the array
 var array = [{ technology: "JavaScript" },{ technology: "Python" },{ technology: "Java" },{ technology: "C" },{ technology: "C++" },{ technology: "C#" },{ technology: "Swift" },{ technology: "Ruby" },{ technology: "PHP" },{ technology: "Go" },{ technology: "Rust" },{ technology: "TypeScript" },{ technology: "Kotlin" },{ technology: "Perl" },{ technology: "Scala" },{ technology: "HTML" },{ technology: "CSS" },{ technology: "SQL" },{ technology: "Assembly" },{ technology: "R" },{ technology: "Lua" },{ technology: "Haskell" },{ technology: "Objective-C" },{ technology: "Dart" },{ technology: "MATLAB" }];

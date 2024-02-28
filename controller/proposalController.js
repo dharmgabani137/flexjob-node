@@ -5,11 +5,11 @@ const joi = require('joi');
 async function proposal(req, res) {
     var data = req.body;
     const schema = joi.object().keys({
-        postId: joi.string(),
-        userId: joi.string(),
-        description: joi.string(),
-        bidAmount: joi.number(),
-        status: joi.string()
+        postId: joi.string().required(),
+        userId: joi.string().required(),
+        description: joi.string().required(),
+        bidAmount: joi.number().required(),
+        status: joi.string().required()
     })
     var valid = schema.validate(data);
 
