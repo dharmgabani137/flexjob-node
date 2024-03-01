@@ -85,26 +85,46 @@ async function postDelete(req, res) {
 }
 
 async function postList(req, res) {
+    const pageNumber = parseInt(req.query.page || 1); // Get the current page number from the query parameters
+    var limit = parseInt(req.query.limit || 5);
+    var skip = (pageNumber - 1 ) * limit;
 
-    const pageNumber = req.query.page || 1; // Get the current page number from the query parameters
-    var limit = req.query.limit || 5;
-    // Number of items per page
 
-    var { docs, total, limit, page, pages } = await PostModel.paginate({}, { page: pageNumber, limit: limit });
 
-    var newD = await Promise.all(docs.map(async (v) => ({
-        ...v._doc, formattedTime: moment(v.createdAt).fromNow(), //spread
-        expertise: await expertiseModel.find({
-            _id: { $in: v.expertise }
-        })
-    })))
+    // // Number of items per page
+
+    var user = await PostModel.aggregate([{
+        $lookup : {
+            from : "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "user"
+        }, 
+    },{$limit : limit}, {$skip : skip}])
     res.json({
-        users: newD,
-        total,
-        limit,
-        page,
-        pages,
-    });
+        data : user
+    })
+
+    // var { docs, total, limit, page, pages } = await PostModel.paginate({}, { page: pageNumber, limit: limit });
+
+
+    // // from id to name of expertise
+    // var newD = await Promise.all(docs.map(async (v) => ({
+    //     ...v._doc, formattedTime: moment(v.createdAt).fromNow(), //spread
+    //     expertise: await expertiseModel.find({
+    //         _id: { $in: v.expertise }
+    //     }),
+    //     user : await UserModel.findOne({
+    //         _id: v.userId 
+    //     })
+    // })))
+//     res.json({
+//         data: newD,
+//         total,
+//         limit,
+//         page,
+//         pages,
+//     });
 }
 
 

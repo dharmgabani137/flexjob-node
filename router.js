@@ -9,7 +9,7 @@ const { employeeData } = require('./controller/employeeController');
 const { employerData } = require('./controller/employerController');
 const { seedData, expertiseData } = require('./controller/expertiseController');
 const { reviews } = require('./controller/reviewsController');
-
+const { sendNotification } = require('./controller/notificationController');
 
 const route = express.Router();
 
@@ -72,9 +72,9 @@ route.get('/profile', verify, profile);
 route.post('/post', verify, post);
 route.post('/post-update', verify, postUpdate);
 route.post('/delete', verify, postDelete);
-route.post('/proposal', proposal);
+route.post('/proposal',verify,proposal);
 route.post('/proposal-update', proposalUpdate);
-route.get('/proposal-by-post', proposalByPost);
+route.get('/proposal-by-post',proposalByPost);
 route.post('/proposal-accept-reject', proposalAcceptReject);
 route.get('/post-list', postList);
 route.get('/employee-data', employeeData);
@@ -84,10 +84,11 @@ route.get('/expertise-data', expertiseData);
 route.post('/send-email', sendEmail);
 route.post('/forget-pass', forgetPass);
 route.post('/reset/:userid/:token', resetPass);
-route.get('proposal-by-user', proposalByUser);
+route.get('/proposal-by-user', proposalByUser);
 route.post('/like', verify,likePost);
 route.post('/save-post',verify,savePost);
-route.post('/reviews',verify,reviews)
+route.post('/reviews',verify,reviews);
+route.get('/sendNotification',sendNotification)
 
 
 // change kkkk

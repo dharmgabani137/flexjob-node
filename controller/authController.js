@@ -1,12 +1,14 @@
 const UserModel = require("../models/userModels");
 const tokenModel = require("../models/tokenModel");
 const loginModel = require("../models/loginModel");
+const reviewsModel = require('../models/reviewsModel');
 const jwt = require('jsonwebtoken');
 const joi = require('joi');
 const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
 const crypto = require('crypto');
 var fs = require('fs');
+const { start } = require("repl");
 
 
 
@@ -159,12 +161,19 @@ async function logout(req, res) {
 async function profile(req, res) {
 
     // var currentUser = req.session.user;
-    var user = await UserModel.findOne({ _id: req.payload._id }, { 'firstName': 1, 'lastName': 1, 'email': 1, 'mobile': 1, 'expertise': 1, 'language': 1, 'title': 1, 'description': 1, 'workHistory': 1, 'location': 1, 'savedJob': 1, 'rate': 1,'img':1 });
+    var user = await UserModel.findOne({ _id: req.payload._id }, { 'firstName': 1, 'lastName': 1, 'email': 1, 'mobile': 1, 'expertise': 1, 'language': 1, 'title': 1, 'description': 1, 'workHistory': 1, 'location': 1, 'savedJob': 1, 'rate': 1, 'img': 1 });
     var createLink = "http://127.0.0.1:4000" + user.img;
+    var reviews = await reviewsModel.find({ userId: req.payload._id });
+    var avarageReview = 0;
+    reviews.forEach(element => {
+        avarageReview += ((element.star) / reviews.length);
+    });
 
     res.json({
-        userData: user,
-        link : createLink
+        userData: { ...user._doc, link: createLink, avarageReview: avarageReview },
+        reviews: reviews,
+
+
     })
 }
 
@@ -314,7 +323,7 @@ async function resetPass(req, res) {
         console.log(token, 'token');
         if (!token) return res.status(400).send("Invalid link or expired");
 
-        const hashedPassword = await bcrypt.hash(user.password, 10);    
+        const hashedPassword = await bcrypt.hash(user.password, 10);
         user.password = hashedPassword;
         await user.save();
         // await token.delete();
@@ -324,7 +333,7 @@ async function resetPass(req, res) {
         res.send("An error occured");
         console.log(error);
     }
-}   
+}
 
 module.exports = {
     registerPost,

@@ -6,21 +6,14 @@ async function proposal(req, res) {
     var data = req.body;
     const schema = joi.object().keys({
         postId: joi.string().required(),
-        userId: joi.string().required(),
         description: joi.string().required(),
         bidAmount: joi.number().required(),
         status: joi.string().required()
     })
     var valid = schema.validate(data);
 
-    if (valid?.error) {
-        console.log(valid.error.message);
-        return res.json({
-            error: valid.error.message
-        })
-    }
-    var user = await ProposalModel.create({ postId: data.postId, userId: data.userId, description: data.description, bidAmount: data.bidAmount, status: data.status});
-
+    var user = await ProposalModel.create({ postId: data.postId, userId: req.payload._id, description: data.description, bidAmount: data.bidAmount, status: data.status });
+    console.log(user);
     res.json({
         status: true,
         message: "created successfully"
@@ -63,16 +56,18 @@ async function proposalUpdate(req, res) {
 
 
 async function proposalByPost(req, res) {
-    try { 
+    var data = req.query;
+    try {
+
         // Adding Pagination 
-        const limitValue = req.query.limit || 2; 
-        const skipValue = req.query.skip || 0; 
-        const posts = await PostModel.find() 
-            .limit(limitValue).skip(skipValue); 
-        res.status(200).send(posts); 
-    } catch (e) { 
-        console.log(e); 
-    } 
+        const limitValue = req.query.limit || 3;
+        const skipValue = req.query.skip || 0;
+        const posts = await ProposalModel.find({ postId: data.postId })
+            .limit(limitValue).skip(skipValue);
+        res.status(200).send(posts);
+    } catch (e) {
+        console.log(e);
+    }
 }
 
 async function proposalAcceptReject(req, res) {
@@ -95,15 +90,17 @@ async function proposalAcceptReject(req, res) {
 
 
 async function proposalByUser(req, res) {
-    var id = req.body.userId;
-    console.log(id, 'id');
-    var user = await PostModel.find({ userId: id })
-
-    res.json({
-        data: user,
-        message: "data fetched successfully",
-
-    })
+    var data = req.query;
+    try {
+        // Adding Pagination 
+        const limitValue = req.query.limit || 3;
+        const skipValue = req.query.skip || 0;
+        const posts = await ProposalModel.find({ userId: data.userId })
+            .limit(limitValue).skip(skipValue);
+        res.status(200).send(posts);
+    } catch (e) {
+        console.log(e);
+    }
 }
 
 
