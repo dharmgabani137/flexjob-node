@@ -2,8 +2,8 @@ const express = require('express');
 const jwt = require("jsonwebtoken");
 const loginModel = require("./models/loginModel");
 // const multer = require('multer');
-const { registerPost, login, logout, update, profile, forgetPass, sendEmail, resetPass } = require('./controller/authController');
-const { post, postUpdate, postDelete, postList , likePost, savePost} = require('./controller/postController');
+const { registerPost, login, logout, update, profile, forgetPass, sendEmail, resetPass, employeeDataById } = require('./controller/authController');
+const { post, postUpdate, postDelete, postList , likePost, savePost, postDataById} = require('./controller/postController');
 const { proposal, proposalUpdate, proposalByPost, proposalAcceptReject, proposalByUser } = require('./controller/proposalController');
 const { employeeData } = require('./controller/employeeController');
 const { employerData } = require('./controller/employerController');
@@ -76,7 +76,7 @@ route.post('/proposal',verify,proposal);
 route.post('/proposal-update', proposalUpdate);
 route.get('/proposal-by-post',proposalByPost);
 route.post('/proposal-accept-reject', proposalAcceptReject);
-route.get('/post-list', postList);
+route.get('/post-list', verify,postList);
 route.get('/employee-data', employeeData);
 route.get('/employer-data', employerData);
 route.get('/seed-expertise', seedData);
@@ -88,7 +88,9 @@ route.get('/proposal-by-user', proposalByUser);
 route.post('/like', verify,likePost);
 route.post('/save-post',verify,savePost);
 route.post('/reviews',verify,reviews);
-route.get('/sendNotification',sendNotification)
+route.get('/sendNotification',sendNotification);
+route.get('/user-by-id/:id',employeeDataById);
+route.get('/post-by-id/:id',postDataById);
 
 
 // change kkkk

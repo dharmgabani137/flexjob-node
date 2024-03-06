@@ -69,8 +69,8 @@ async function registerPost(req, res) {
             location: data.location,
             savedJob: data.savedJob,
             rate: data.rate,
+            img : '/img/C:\Users\Janvi\Pictures\Screenshots'
         })
-        console.log(checkEmail, 'cc')
 
         res.json({
             status: true,
@@ -213,7 +213,7 @@ async function update(req, res) {
         let uploadedFile = req.files.image;
         {
             var img = '/img/' + req.payload.firstName + new Date().getTime() + "." + uploadedFile.mimetype.slice(6)
-
+        
             // Use the mv() method to place the file somewhere on your server'
             uploadedFile.mv('./public' + img, function (err) {
                 if (err) return res.status(500).send(err);
@@ -335,6 +335,14 @@ async function resetPass(req, res) {
     }
 }
 
+
+async function employeeDataById(req,res) {
+        var user = await UserModel.findOne({_id : req.params.id});
+        res.json({
+                data : user
+        })
+}
+
 module.exports = {
     registerPost,
     login,
@@ -343,5 +351,6 @@ module.exports = {
     update,
     sendEmail,
     forgetPass,
-    resetPass
+    resetPass,
+    employeeDataById
 }

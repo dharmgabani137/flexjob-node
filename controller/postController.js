@@ -4,6 +4,7 @@ const joi = require('joi');
 const moment = require('moment');
 const UserModel = require('../models/userModels');
 const { login } = require('./authController');
+const { text } = require('body-parser');
 
 async function post(req, res) {
 
@@ -14,16 +15,16 @@ async function post(req, res) {
         title: joi.string().min(3).required(),
         expertise: joi.array().required(),
         budget: joi.number().required(),
-        status : joi.string().required()
+        
     })
- 
+
     var valid = schema.validate(data)
     if (valid?.error) {
         return res.json({
             error: valid.error.message
         })
     }
-    var user = await PostModel.create({ userId: req.payload._id, description: data.description, title: data.title, expertise: data.expertise, budget: data.budget, status: data.status});
+    var user = await PostModel.create({ userId: req.payload._id, description: data.description, title: data.title, expertise: data.expertise, budget: data.budget });
     res.json({
         status: true,
         message: "created successfully"
@@ -85,120 +86,136 @@ async function postDelete(req, res) {
 }
 
 async function postList(req, res) {
-    const pageNumber = parseInt(req.query.page || 1); // Get the current page number from the query parameters
-    var limit = parseInt(req.query.limit || 5);
-    var skip = (pageNumber - 1 ) * limit;
+
+    const searchQuery = req.query.s;
+    const search = req.query.e;
+    const pageNumber = parseInt(req.query.page || 1);
+    const limit = parseInt(req.query.limit || 5);
+    const skip = (pageNumber - 1) * limit;
+
+    var aggregate = [
+        {
+            $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "user"
+            }
+        },
+        { $limit: limit },
+        { $skip: skip }
+    ];
+
+
+    if (req.query?.s) {
+        aggregate.push({ $match: { title: { $regex: searchQuery, $options: 'i' } } })
+        aggregate.push({ $match: { description: { $regex: searchQuery, $options: 'i' } } })
+    }
 
 
 
-    // // Number of items per page
+    var user = await PostModel.aggregate(aggregate)
 
-    var user = await PostModel.aggregate([{
-        $lookup : {
-            from : "users",
-            localField: "userId",
-            foreignField: "_id",
-            as: "user"
-        }, 
-    },{$limit : limit}, {$skip : skip}])
+
+    var newD = await Promise.all(user.map(async (v) => ({
+        ...v, //spread
+        formattedTime: moment(v.createdAt).fromNow(),
+        expertise: await expertiseModel.find({
+            _id: { $in: v.expertise }
+
+        }),
+        liked: v.likeBy.includes(req.payload._id)
+    })))
+
+
+
     res.json({
-        data : user
+        data: newD
     })
 
-    // var { docs, total, limit, page, pages } = await PostModel.paginate({}, { page: pageNumber, limit: limit });
-
-
-    // // from id to name of expertise
-    // var newD = await Promise.all(docs.map(async (v) => ({
-    //     ...v._doc, formattedTime: moment(v.createdAt).fromNow(), //spread
-    //     expertise: await expertiseModel.find({
-    //         _id: { $in: v.expertise }
-    //     }),
-    //     user : await UserModel.findOne({
-    //         _id: v.userId 
-    //     })
-    // })))
-//     res.json({
-//         data: newD,
-//         total,
-//         limit,
-//         page,
-//         pages,
-//     });
 }
+
+
 
 
 async function likePost(req, res) {
     var data = req.body;
     var loginUser = req.payload;
     var findUser = await PostModel.findOne({ _id: data.postId });
-        if(!findUser){
-            res.json({
-                status : false,
-                message : "post not found"
-            })
-        }
-        if(findUser.likeBy.includes(loginUser._id)){
-            const index = findUser.likeBy.indexOf(loginUser._id);
-            findUser.likeBy.splice(index,1);
-            findUser.save();
-            res.json({
-                    status : true,
-                    like : false,
-                    message : "like removed"
-            })
-        }
-        else{
-            findUser.likeBy.push(loginUser._id);
-            findUser.save();
-            res.json({
-                status : true,
-                like : true,
-                message : "post liked successfully"
-            })
-        }
+    if (!findUser) {
+        res.json({
+            status: false,
+            message: "post not found"
+        })
+    }
+    if (findUser.likeBy.includes(loginUser._id)) {
+        const index = findUser.likeBy.indexOf(loginUser._id);
+        findUser.likeBy.splice(index, 1);
+        findUser.save();
+        res.json({
+            status: true,
+            like: false,
+            message: "like removed"
+        })
+    }
+    else {
+        findUser.likeBy.push(loginUser._id);
+        findUser.save();
+        res.json({
+            status: true,
+            like: true,
+            message: "post liked successfully"
+        })
+    }
 }
 
-async function savePost(req,res) {
+async function savePost(req, res) {
     var data = req.body;
     var loginUser = req.payload;
-    var user = await UserModel.findOne({_id : loginUser._id});
-    if(!user){
+    var user = await UserModel.findOne({ _id: loginUser._id });
+    if (!user) {
         res.json({
-            status : false,
-            message : "user not found"
+            status: false,
+            message: "user not found"
         })
     }
-    if(user.savedJob.includes(data.postId)){
+    if (user.savedJob.includes(data.postId)) {
         const index = user.savedJob.indexOf(loginUser._id);
-        user.savedJob.splice(index,1);
+        user.savedJob.splice(index, 1);
         user.save();
         res.json({
-                status : true,
-                like : false,
-                message : "post removed"
+            status: true,
+            like: false,
+            message: "post removed"
         })
     }
-    else{
+    else {
         user.savedJob.push(data.postId);
         user.save();
         res.json({
-            status : true,
-            like : true,
-            message : "post saved successfully"
-        })  
+            status: true,
+            like: true,
+            message: "post saved successfully"
+        })
     }
 
 
 
 }
 
+async function postDataById(req, res) {
+    var user = await PostModel.findOne({ _id: req.params.id });
+    res.json({
+        data: user
+    })
+}
 module.exports = {
     post,
     postUpdate,
     postDelete,
     postList,
     likePost,
-    savePost
+    savePost,
+    postDataById
 }
 

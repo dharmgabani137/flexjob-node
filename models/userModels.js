@@ -65,7 +65,8 @@ var userSchema = new mongoose.Schema({
     img : {
         type : String,
         require : true
-    }
+    },
+
 })
 userSchema.plugin(mongoosePaginate);
 const UserModel = mongoose.model('user', userSchema);

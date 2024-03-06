@@ -27,12 +27,13 @@ var postSchema = new mongoose.Schema({
         type: String,
         require: true
     },
-    likeBy: [
+    likeBy: 
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Array,
+            default : [],
             ref: "user"
         }
-    ]
+    
 
 
 
