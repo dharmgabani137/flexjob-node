@@ -15,7 +15,6 @@ async function post(req, res) {
         title: joi.string().min(3).required(),
         expertise: joi.array().required(),
         budget: joi.number().required(),
-
     })
 
     var valid = schema.validate(data)
@@ -36,7 +35,7 @@ async function postUpdate(req, res) {
     const schema = joi.object().keys({
         id: joi.string(),
         userId: joi.string(),
-        description: joi.string().alphanum().min(10).max(1000),
+        description: joi.string().min(10).max(1000),
         title: joi.string().min(3).max(10),
         expertise: joi.array(),
         budget: joi.number(),
@@ -90,9 +89,12 @@ async function postList(req, res) {
     const searchQuery = req.query.s;
     const search = req.query.e;
 
-    const pageNumber = parseInt(req.query.page || 1);
-    const limit = parseInt(req.query.limit || 5);
-    const skip = (pageNumber - 1) * limit;
+    // pagination
+    const page = parseInt(req.query.page || 1);
+    const limit = parseInt(req.query.limit || 3);
+
+    // Calculate the start and end indexes for the requested page
+    var skip = (page - 1) * limit;
 
     var aggregate = [
         {
@@ -103,6 +105,7 @@ async function postList(req, res) {
                 as: "user"
             }
         },
+        { $sort: { createdAt: -1 } }
     ];
 
 
@@ -118,7 +121,7 @@ async function postList(req, res) {
     aggregate.push({ $skip: skip })
 
     var user = await PostModel.aggregate(aggregate)
-    console.log(count, 'count');
+    console.log(aggregate, 'aggregate');
 
 
     var newD = await Promise.all(user.map(async (v) => ({
@@ -136,9 +139,10 @@ async function postList(req, res) {
     res.json({
         data: newD,
         totalPages: totalPages,
-        currentPage: pageNumber,
-        nextPage: pageNumber + 1 > totalPages ? false : pageNumber + 1,
-        prevPage: pageNumber - 1 ? pageNumber - 1 : false
+        currentPage: page,
+        nextPage: page + 1 > totalPages ? false : page + 1,
+        prevPage: page - 1 >= 1 ? page - 1 : false,
+        message: "success"
     })
 
 }

@@ -69,7 +69,7 @@ async function registerPost(req, res) {
             location: data.location,
             savedJob: data.savedJob,
             rate: data.rate,
-            img : '/img/C:\Users\Janvi\Pictures\Screenshots'
+            img : '/avatar.jpg'
         })
 
         res.json({

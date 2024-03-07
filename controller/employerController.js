@@ -1,26 +1,26 @@
 const UserModel = require("../models/userModels");
-async function employerData(req,res) {
+async function employerData(req, res) {
 
-    const pageNumber = req.query.page || 1; // Get the current page number from the query parameters
-    const limit = req.query.limit || 5;
-     // Number of items per page
+    // pagination
+    const page = parseInt(req.query.page || 1);
+    const limit = parseInt(req.query.limit || 3);
+    // Number of items per page
+    var skip = (page - 1) * limit;
 
 
-    UserModel.paginate({type : 'employer'}, { page: pageNumber, limit: limit }, (err, result) => {
-        if (err) {
-            return res.status(500).json({ message: 'Error occurred while fetching users.' });
-        }   
+    const user = await UserModel.find({ type: 'employer' }).skip(skip).limit(limit);
+    const total = await UserModel.countDocuments({ type: 'employer' });
+    var totalPages = Math.ceil(total / limit)
 
-        const { docs, total, limit, page, pages } = result;
-        res.json({ users: docs, total, limit, page, pages });
+    res.json({
+        users: user,
+        totalPages: totalPages,
+        currentPage: page,
+        nextPage: page + 1 > totalPages ? false : page + 1,
+        prevPage: page - 1 >= 1 ? page - 1 : false,
+        message: "success"
     });
 
-
-    // res.json({
-    //     data : user,
-    //     message : "record fetched"
-    // })
-    
 }
 
 module.exports = {
