@@ -10,6 +10,7 @@ const { employerData } = require('./controller/employerController');
 const { seedData, expertiseData } = require('./controller/expertiseController');
 const { reviews } = require('./controller/reviewsController');
 const { sendNotification } = require('./controller/notificationController');
+const { dashbord, loginPost, loginGet, table, adminData } = require('./controller/homeController');
 
 const route = express.Router();
 
@@ -91,6 +92,18 @@ route.post('/reviews',verify,reviews);
 route.get('/sendNotification',sendNotification);
 route.get('/user-by-id/:id',employeeDataById);
 route.get('/post-by-id/:id',postDataById);
+route.post('/admin-data',adminData);
+
+
+
+
+
+
+route.get('/dashbord',dashbord);
+route.get('/login-admin',loginGet);
+route.post('/login-admin',loginPost);
+route.get('/table',table);
+
 
 
 // change kkkk

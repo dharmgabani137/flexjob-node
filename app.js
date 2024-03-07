@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require("body-parser")
 const { route } = require('./router')
 const mongoose = require('mongoose');
+var expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
 const cors = require("cors");
@@ -23,9 +24,9 @@ app.use(session({
     }
 }))
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(expressLayouts)
 app.use(bodyParser.json());
-
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(cors({
     origin: "*",
@@ -38,10 +39,11 @@ app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: '/public/img/'
 }));
+
+app.set("view engine", "ejs")
+app.set('layout', 'layout/layout')
+
 app.use('/', route);
-
-
-
 
 app.listen(4000, e => {
     console.log('server is running');
