@@ -190,9 +190,9 @@ async function update(req, res) {
         expertise: joi.array(),
         title: joi.string(),
         description: joi.string(),
-        workHistory: joi.array(),
+        // workHistory: joi.array(),
         location: joi.string(),
-        savedJob: joi.array(),
+        // savedJob: joi.array(),
         rate: joi.string()
     });
     var valid = schema.validate(data);

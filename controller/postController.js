@@ -11,11 +11,11 @@ async function post(req, res) {
     var data = req.body;
     const schema = joi.object().keys({
         // userId: joi.string().required(),
-        description: joi.string().alphanum().min(10).max(1000).required(),
+        description: joi.string().min(10).max(1000).required(),
         title: joi.string().min(3).required(),
         expertise: joi.array().required(),
         budget: joi.number().required(),
-        
+
     })
 
     var valid = schema.validate(data)
@@ -89,6 +89,7 @@ async function postList(req, res) {
 
     const searchQuery = req.query.s;
     const search = req.query.e;
+
     const pageNumber = parseInt(req.query.page || 1);
     const limit = parseInt(req.query.limit || 5);
     const skip = (pageNumber - 1) * limit;
@@ -102,8 +103,6 @@ async function postList(req, res) {
                 as: "user"
             }
         },
-        { $limit: limit },
-        { $skip: skip }
     ];
 
 
@@ -113,8 +112,13 @@ async function postList(req, res) {
     }
 
 
+    var count = await PostModel.aggregate([...aggregate, { $count: "total" }])
+
+    aggregate.push({ $limit: limit })
+    aggregate.push({ $skip: skip })
 
     var user = await PostModel.aggregate(aggregate)
+    console.log(count, 'count');
 
 
     var newD = await Promise.all(user.map(async (v) => ({
@@ -127,10 +131,14 @@ async function postList(req, res) {
         liked: v.likeBy.includes(req.payload._id)
     })))
 
-
+    var totalPages = Math.ceil(count[0].total / limit)
 
     res.json({
-        data: newD
+        data: newD,
+        totalPages: totalPages,
+        currentPage: pageNumber,
+        nextPage: pageNumber + 1 > totalPages ? false : pageNumber + 1,
+        prevPage: pageNumber - 1 ? pageNumber - 1 : false
     })
 
 }
