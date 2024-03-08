@@ -27,15 +27,11 @@ var postSchema = new mongoose.Schema({
         type: String,
         require: true
     },
-    likeBy: 
-        {
-            type: Array,
-            default : [],
-            ref: "user"
-        }
-    
-
-
+    likeBy: {
+        type: Array,
+        default: [],
+        ref: "user"
+    }
 
 }, { timestamps: {} })
 postSchema.plugin(mongoosePaginate);

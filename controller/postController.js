@@ -3,8 +3,6 @@ const PostModel = require('../models/postModels');
 const joi = require('joi');
 const moment = require('moment');
 const UserModel = require('../models/userModels');
-const { login } = require('./authController');
-const { text } = require('body-parser');
 
 async function post(req, res) {
 
@@ -110,15 +108,14 @@ async function postList(req, res) {
 
 
     if (req.query?.s) {
-        aggregate.push({ $match: { title: { $regex: searchQuery, $options: 'i' } } })
-        aggregate.push({ $match: { description: { $regex: searchQuery, $options: 'i' } } })
+        aggregate.push({ $match: { $or: [{ title: { $regex: searchQuery, $options: 'i' } }, { description: { $regex: searchQuery, $options: 'i' } }] } })
     }
 
 
     var count = await PostModel.aggregate([...aggregate, { $count: "total" }])
 
-    aggregate.push({ $limit: limit })
     aggregate.push({ $skip: skip })
+    aggregate.push({ $limit: limit })
 
     var user = await PostModel.aggregate(aggregate)
     console.log(aggregate, 'aggregate');
