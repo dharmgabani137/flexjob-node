@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const loginModel = require("./models/loginModel");
 // const multer = require('multer');
 const { registerPost, login, logout, update, profile, forgetPass, sendEmail, resetPass, employeeDataById } = require('./controller/authController');
-const { post, postUpdate, postDelete, postList , likePost, savePost, postDataById} = require('./controller/postController');
+const { post, postUpdate, postDelete, postList, likePost, savePost, postDataById } = require('./controller/postController');
 const { proposal, proposalUpdate, proposalByPost, proposalAcceptReject, proposalByUser } = require('./controller/proposalController');
 const { employeeData } = require('./controller/employeeController');
 const { employerData } = require('./controller/employerController');
@@ -67,17 +67,20 @@ async function verify(req, res, next) {
 
 route.post('/register', registerPost);
 route.post('/login', login);
-route.post('/logout', logout);  
+route.post('/logout', logout);
 route.post('/profile-update', verify, update);
 route.get('/profile', verify, profile);
+
 route.post('/post', verify, post);
 route.post('/post-update', verify, postUpdate);
+route.get('/post-by-id/:id', verify,postDataById);
+
 route.post('/delete', verify, postDelete);
-route.post('/proposal',verify,proposal);
+route.post('/proposal', verify, proposal);
 route.post('/proposal-update', proposalUpdate);
-route.get('/proposal-by-post',proposalByPost);
+route.get('/proposal-by-post', proposalByPost);
 route.post('/proposal-accept-reject', proposalAcceptReject);
-route.get('/post-list', verify,postList);
+route.get('/post-list', verify, postList);
 route.get('/employee-data', employeeData);
 route.get('/employer-data', employerData);
 route.get('/seed-expertise', seedData);
@@ -86,23 +89,22 @@ route.post('/send-email', sendEmail);
 route.post('/forget-pass', forgetPass);
 route.post('/reset/:userid/:token', resetPass);
 route.get('/proposal-by-user', proposalByUser);
-route.post('/like', verify,likePost);
-route.post('/save-post',verify,savePost);
-route.post('/reviews',verify,reviews);
-route.get('/sendNotification',sendNotification);
-route.get('/user-by-id/:id',employeeDataById);
-route.get('/post-by-id/:id',postDataById);
-route.post('/admin-data',adminData);
+route.post('/like', verify, likePost);
+route.post('/save-post', verify, savePost);
+route.post('/reviews', verify, reviews);
+route.get('/sendNotification', sendNotification);
+route.get('/user-by-id/:id', employeeDataById);
+route.post('/admin-data', adminData);
 
 
 
 
 
 
-route.get('/dashbord',dashbord);
-route.get('/login-admin',loginGet);
-route.post('/login-admin',loginPost);
-route.get('/table',table);
+route.get('/dashbord', dashbord);
+route.get('/login-admin', loginGet);
+route.post('/login-admin', loginPost);
+route.get('/table', table);
 
 
 

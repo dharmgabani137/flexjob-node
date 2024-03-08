@@ -3,6 +3,7 @@ const PostModel = require('../models/postModels');
 const joi = require('joi');
 const moment = require('moment');
 const UserModel = require('../models/userModels');
+const { default: mongoose } = require('mongoose');
 
 async function post(req, res) {
 
@@ -213,11 +214,45 @@ async function savePost(req, res) {
 }
 
 async function postDataById(req, res) {
-    var user = await PostModel.findOne({ _id: req.params.id });
+    console.log(req.params, 'req.params.id');
+
+    var post = await PostModel.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.params.id)
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "user"
+            }
+        }
+    ]);
+
+    if (!post) {
+        return res.json({
+            status: false,
+            message: "post not found"
+        })
+    }
+    console.log(post, 'post');
+    var expertise = await expertiseModel.find({
+        _id: { $in: post[0].expertise }
+    })
+
     res.json({
-        data: user
+        data: {
+            ...post[0], expertise: expertise,
+            formattedTime: moment(post[0].createdAt).fromNow(),
+            liked: post[0].likeBy.includes(req.payload._id)
+        },
+        status: true,
     })
 }
+
 module.exports = {
     post,
     postUpdate,
