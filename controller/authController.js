@@ -48,7 +48,8 @@ async function registerPost(req, res) {
     if (valid?.error) {
         console.log(valid.error.message);
         return res.json({
-            error: valid.error.message
+            error: valid.error.message,
+            status : false
         })
     }
 
@@ -89,7 +90,13 @@ async function registerPost(req, res) {
 async function login(req, res) {
     var data = req.body;
     var user = await UserModel.findOne({ email: data.email });
-
+    console.log(user);
+    if(user.userBlock){
+        res.status(500).json({
+            status: false,
+            message: 'you are blocked'
+        });
+    }
     if (user == null) {
         return res.json({
             status: false,
@@ -97,7 +104,6 @@ async function login(req, res) {
         })
     }
     const passwordMatch = await bcrypt.compare(data.password, user.password);
-    console.log(passwordMatch);
 
 
     if (passwordMatch) {
@@ -116,7 +122,6 @@ async function login(req, res) {
             location: user.location,
             savedJob: user.savedJob,
             rate: user.rate,
-
         }, 'your_secret_key', { expiresIn: '1w' });
         await loginModel.create({ userId: user._id, token: token });
         return res.json({
@@ -126,7 +131,6 @@ async function login(req, res) {
         });
 
     } else {
-
         return res.json({
             status: false,
             message: 'Invalid email or password'
@@ -172,8 +176,7 @@ async function profile(req, res) {
     res.json({
         userData: { ...user._doc, link: createLink, avarageReview: avarageReview },
         reviews: reviews,
-
-
+        status : true,
     })
 }
 
@@ -198,7 +201,8 @@ async function update(req, res) {
     var valid = schema.validate(data);
     if (valid?.error) {
         return res.json({
-            error: valid.error.message
+            error: valid.error.message,
+            status : false
         })
     }
 
@@ -295,7 +299,7 @@ async function forgetPass(req, res) {
         await sendEmail(user.email, "Password reset", link);
 
         res.json({
-            status: "true",
+            status: true,
             message: "password reset link sent to your email account"
         });
     } catch (error) {
@@ -339,7 +343,8 @@ async function resetPass(req, res) {
 async function employeeDataById(req,res) {
         var user = await UserModel.findOne({_id : req.params.id});
         res.json({
-                data : user
+                data : user,
+                status : true
         })
 }
 

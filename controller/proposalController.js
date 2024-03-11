@@ -33,6 +33,7 @@ async function proposalUpdate(req, res) {
     if (valid?.error) {
         console.log(valid.error.message);
         return res.json({
+            status : false,
             error: valid.error.message
         })
     }

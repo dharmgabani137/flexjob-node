@@ -21,9 +21,11 @@ async function post(req, res) {
     var valid = schema.validate(data)
     if (valid?.error) {
         return res.json({
+            status : false,
             error: valid.error.message
         })
     }
+    console.log(req.payload);
     var user = await PostModel.create({ userId: req.payload._id, description: data.description, title: data.title, expertise: data.expertise, budget: data.budget });
     res.json({
         status: true,
@@ -46,6 +48,7 @@ async function postUpdate(req, res) {
     var valid = schema.validate(data)
     if (valid?.error) {
         return res.json({
+            status : false,
             error: valid.error.message
         })
     }
@@ -130,6 +133,7 @@ async function postList(req, res) {
 
 
     res.json({
+        status : true,
         data: newD
     })
 
@@ -206,6 +210,7 @@ async function savePost(req, res) {
 async function postDataById(req, res) {
     var user = await PostModel.findOne({ _id: req.params.id });
     res.json({
+        status : true,
         data: user
     })
 }

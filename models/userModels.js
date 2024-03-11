@@ -63,9 +63,14 @@ var userSchema = new mongoose.Schema({
         require : true
     },
     img : {
-        type : String,
+        type : String,  
         require : true
     },
+    userBlock : {
+        type : Boolean,
+        default : false,
+        require : true
+    }
 
 })
 userSchema.plugin(mongoosePaginate);

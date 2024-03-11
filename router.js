@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require("jsonwebtoken");
 const loginModel = require("./models/loginModel");
+// const UserModel = require("./models/userModels");
 // const multer = require('multer');
 const { registerPost, login, logout, update, profile, forgetPass, sendEmail, resetPass, employeeDataById } = require('./controller/authController');
 const { post, postUpdate, postDelete, postList , likePost, savePost, postDataById} = require('./controller/postController');
@@ -10,7 +11,7 @@ const { employerData } = require('./controller/employerController');
 const { seedData, expertiseData } = require('./controller/expertiseController');
 const { reviews } = require('./controller/reviewsController');
 const { sendNotification } = require('./controller/notificationController');
-const { dashbord, loginPost, loginGet, table, adminData } = require('./controller/homeController');
+const { dashbord, loginPost, loginGet, table, adminData, createData, insertData, updateView, updateData, userDelete, userBlock } = require('./controller/homeController');
 
 const route = express.Router();
 
@@ -58,6 +59,7 @@ async function verify(req, res, next) {
             throw new Error("Invalid token");
         }
         req.payload = payload;
+        
         next();
     } catch (error) {
         res.status(401).json({ message: "Unauthorized: Invalid or expired token" });
@@ -99,10 +101,17 @@ route.post('/admin-data',adminData);
 
 
 
+
 route.get('/dashbord',dashbord);
 route.get('/login-admin',loginGet);
 route.post('/login-admin',loginPost);
 route.get('/table',table);
+route.get('/create-data',createData);
+route.post('/insert-data',insertData);
+route.get('/update-view',updateView);
+route.post('/update-data',updateData);
+route.get('/user-delete',userDelete);
+route.get('/user-block',userBlock);
 
 
 
