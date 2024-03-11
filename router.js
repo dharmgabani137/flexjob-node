@@ -59,7 +59,7 @@ async function verify(req, res, next) {
             throw new Error("Invalid token");
         }
         req.payload = payload;
-        
+
         next();
     } catch (error) {
         res.status(401).json({ message: "Unauthorized: Invalid or expired token" });
@@ -75,7 +75,7 @@ route.get('/profile', verify, profile);
 
 route.post('/post', verify, post);
 route.post('/post-update', verify, postUpdate);
-route.get('/post-by-id/:id', verify,postDataById);
+route.get('/post-by-id/:id', verify, postDataById);
 
 route.post('/delete', verify, postDelete);
 route.post('/proposal', verify, proposal);
@@ -104,16 +104,16 @@ route.post('/admin-data', adminData);
 
 
 
-route.get('/dashbord',dashbord);
-route.get('/login-admin',loginGet);
-route.post('/login-admin',loginPost);
-route.get('/table',table);
-route.get('/create-data',createData);
-route.post('/insert-data',insertData);
-route.get('/update-view',updateView);
-route.post('/update-data',updateData);
-route.get('/user-delete',userDelete);
-route.get('/user-block',userBlock);
+route.get('/dashbord', dashbord);
+route.get('/login-admin', loginGet);
+route.post('/login-admin', loginPost);
+route.get('/table', table);
+route.get('/create-data', createData);
+route.post('/insert-data', insertData);
+route.get('/update-view', updateView);
+route.post('/update-data', updateData);
+route.get('/user-delete', userDelete);
+route.get('/user-block', userBlock);
 
 
 
