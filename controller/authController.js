@@ -49,7 +49,7 @@ async function registerPost(req, res) {
         console.log(valid.error.message);
         return res.json({
             error: valid.error.message,
-            status : false
+            status: false
         })
     }
 
@@ -70,7 +70,7 @@ async function registerPost(req, res) {
             location: data.location,
             savedJob: data.savedJob,
             rate: data.rate,
-            img : '/img/C:\Users\Janvi\Pictures\Screenshots'
+            img: '/avatar.jpg'
         })
 
         res.json({
@@ -91,7 +91,7 @@ async function login(req, res) {
     var data = req.body;
     var user = await UserModel.findOne({ email: data.email });
     console.log(user);
-    if(user.userBlock){
+    if (user.userBlock) {
         res.status(500).json({
             status: false,
             message: 'you are blocked'
@@ -176,7 +176,7 @@ async function profile(req, res) {
     res.json({
         userData: { ...user._doc, link: createLink, avarageReview: avarageReview },
         reviews: reviews,
-        status : true,
+        status: true,
     })
 }
 
@@ -193,16 +193,16 @@ async function update(req, res) {
         expertise: joi.array(),
         title: joi.string(),
         description: joi.string(),
-        workHistory: joi.array(),
+        // workHistory: joi.array(),
         location: joi.string(),
-        savedJob: joi.array(),
+        // savedJob: joi.array(),
         rate: joi.string()
     });
     var valid = schema.validate(data);
     if (valid?.error) {
         return res.json({
             error: valid.error.message,
-            status : false
+            status: false
         })
     }
 
@@ -217,7 +217,7 @@ async function update(req, res) {
         let uploadedFile = req.files.image;
         {
             var img = '/img/' + req.payload.firstName + new Date().getTime() + "." + uploadedFile.mimetype.slice(6)
-        
+
             // Use the mv() method to place the file somewhere on your server'
             uploadedFile.mv('./public' + img, function (err) {
                 if (err) return res.status(500).send(err);
@@ -340,12 +340,12 @@ async function resetPass(req, res) {
 }
 
 
-async function employeeDataById(req,res) {
-        var user = await UserModel.findOne({_id : req.params.id});
-        res.json({
-                data : user,
-                status : true
-        })
+async function employeeDataById(req, res) {
+    var user = await UserModel.findOne({ _id: req.params.id });
+    res.json({
+        data: user,
+        status: true
+    })
 }
 
 module.exports = {

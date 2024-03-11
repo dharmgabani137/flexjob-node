@@ -3,19 +3,17 @@ const PostModel = require('../models/postModels');
 const joi = require('joi');
 const moment = require('moment');
 const UserModel = require('../models/userModels');
-const { login } = require('./authController');
-const { text } = require('body-parser');
+const { default: mongoose } = require('mongoose');
 
 async function post(req, res) {
 
     var data = req.body;
     const schema = joi.object().keys({
         // userId: joi.string().required(),
-        description: joi.string().alphanum().min(10).max(1000).required(),
+        description: joi.string().min(10).max(1000).required(),
         title: joi.string().min(3).required(),
         expertise: joi.array().required(),
         budget: joi.number().required(),
-        
     })
 
     var valid = schema.validate(data)
@@ -38,7 +36,7 @@ async function postUpdate(req, res) {
     const schema = joi.object().keys({
         id: joi.string(),
         userId: joi.string(),
-        description: joi.string().alphanum().min(10).max(1000),
+        description: joi.string().min(10).max(1000),
         title: joi.string().min(3).max(10),
         expertise: joi.array(),
         budget: joi.number(),
@@ -92,9 +90,13 @@ async function postList(req, res) {
 
     const searchQuery = req.query.s;
     const search = req.query.e;
-    const pageNumber = parseInt(req.query.page || 1);
-    const limit = parseInt(req.query.limit || 5);
-    const skip = (pageNumber - 1) * limit;
+
+    // pagination
+    const page = parseInt(req.query.page || 1);
+    const limit = parseInt(req.query.limit || 3);
+
+    // Calculate the start and end indexes for the requested page
+    var skip = (page - 1) * limit;
 
     var aggregate = [
         {
@@ -105,19 +107,22 @@ async function postList(req, res) {
                 as: "user"
             }
         },
-        { $limit: limit },
-        { $skip: skip }
+        { $sort: { createdAt: -1 } }
     ];
 
 
     if (req.query?.s) {
-        aggregate.push({ $match: { title: { $regex: searchQuery, $options: 'i' } } })
-        aggregate.push({ $match: { description: { $regex: searchQuery, $options: 'i' } } })
+        aggregate.push({ $match: { $or: [{ title: { $regex: searchQuery, $options: 'i' } }, { description: { $regex: searchQuery, $options: 'i' } }] } })
     }
 
 
+    var count = await PostModel.aggregate([...aggregate, { $count: "total" }])
+
+    aggregate.push({ $skip: skip })
+    aggregate.push({ $limit: limit })
 
     var user = await PostModel.aggregate(aggregate)
+    console.log(aggregate, 'aggregate');
 
 
     var newD = await Promise.all(user.map(async (v) => ({
@@ -130,11 +135,15 @@ async function postList(req, res) {
         liked: v.likeBy.includes(req.payload._id)
     })))
 
-
+    var totalPages = Math.ceil(count[0].total / limit)
 
     res.json({
-        status : true,
-        data: newD
+        data: newD,
+        totalPages: totalPages,
+        currentPage: page,
+        nextPage: page + 1 > totalPages ? false : page + 1,
+        prevPage: page - 1 >= 1 ? page - 1 : false,
+        message: "success"
     })
 
 }
@@ -208,12 +217,45 @@ async function savePost(req, res) {
 }
 
 async function postDataById(req, res) {
-    var user = await PostModel.findOne({ _id: req.params.id });
+    console.log(req.params, 'req.params.id');
+
+    var post = await PostModel.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.params.id)
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "user"
+            }
+        }
+    ]);
+
+    if (!post) {
+        return res.json({
+            status: false,
+            message: "post not found"
+        })
+    }
+    console.log(post, 'post');
+    var expertise = await expertiseModel.find({
+        _id: { $in: post[0].expertise }
+    })
+
     res.json({
-        status : true,
-        data: user
+        data: {
+            ...post[0], expertise: expertise,
+            formattedTime: moment(post[0].createdAt).fromNow(),
+            liked: post[0].likeBy.includes(req.payload._id)
+        },
+        status: true,
     })
 }
+
 module.exports = {
     post,
     postUpdate,
