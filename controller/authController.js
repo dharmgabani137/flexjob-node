@@ -323,7 +323,7 @@ async function resetPass(req, res) {
         const token = await tokenModel.findOne({
             userId: user._id,
             token: req.params.token,
-        });
+        }); 
         console.log(token, 'token');
         if (!token) return res.status(400).send("Invalid link or expired");
 
