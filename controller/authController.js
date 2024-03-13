@@ -260,8 +260,8 @@ async function sendEmail(email, subject, text) {
         // service: process.env.SERVICE,
         port: 2525,
         auth: {
-            user: "b76b91e1e7a147",
-            pass: "e1e9ec0e05dd59",
+            user: "aad4eed98d6747",
+            pass: "9ad860e39d32be",
         },
     });
     await transporter.sendMail({
@@ -291,7 +291,7 @@ async function forgetPass(req, res) {
             }).save();
         }
 
-        const link = `http://127.0.0.1:4000/reset/${user._id}/${token.token}`;
+        const link = `http://127.0.0.1:3000/reset/${user._id}/${token.token}`;
         await sendEmail(user.email, "Password reset", link);
 
         res.json({
@@ -309,28 +309,48 @@ async function forgetPass(req, res) {
 
 async function resetPass(req, res) {
     try {
+        console.log(req.body);
         const schema = joi.object({ password: joi.string().required() });
         const { error } = schema.validate(req.body);
-        if (error) return res.status(400).send(error.details[0].message);
+
+
+        if (error) return res.json({
+            message: error.details[0].message,
+            status: false
+        });
+
+
         const user = await UserModel.findById(req.params.userid);
         console.log(user);
-        if (!user) return res.status(400).send("invalid link or expired");
+        if (!user) return res.json({
+            message: "invalid link or expired",
+            status: false
+        });
         console.log(user, 'user');
         const token = await tokenModel.findOne({
             userId: user._id,
             token: req.params.token,
         });
         console.log(token, 'token');
-        if (!token) return res.status(400).send("Invalid link or expired");
+        if (!token) return res.json({
+            message: "invalid link or expired",
+            status: false
+        });
 
-        const hashedPassword = await bcrypt.hash(user.password, 10);
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
         user.password = hashedPassword;
         await user.save();
         // await token.delete();
 
-        res.send("password reset sucessfully.");
+        res.json({
+            message: "password reset sucessfully.",
+            status: true
+        });
     } catch (error) {
-        res.send("An error occured");
+        res.json({
+            message: "An error occured",
+            status: false
+        });
         console.log(error);
     }
 }
