@@ -8,7 +8,7 @@
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+            <a href="/create-data">create</a>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -28,6 +28,9 @@
                             <th>savedJob</th>
                             <th>rate</th>
                             <th>img</th>
+                            <th>update</th>
+                            <th>delete</th>
+                            <th>block</th>
                         </tr>
                     </thead>
                     <tfoot>
@@ -45,27 +48,70 @@
                             <th>savedJob</th>
                             <th>rate</th>
                             <th>img</th>
+                            <th>user update</th>
+                            <th>delete</th>
 
                         </tr>
                     </tfoot>
                     <tbody>
-                        <% user.forEach(element => { %>
-                                <tr>
-                                    <td><%= element.firstName %></td>
-                                    <td><%= element.lastName %></td>
-                                    <td><%= element.email %></td>
-                                    <td><%= element.password %></td>`
-                                    <td><%= element.mobile %></td>
-                                    <td><%= element.expertise %></td>
-                                    <td><%= element.title %></td>
-                                    <td><%= element.description %></td>
-                                    <td><%= element.workHistory %></td>
-                                    <td><%= element.location %></td>
-                                    <td><%= element.savedJob %></td>
-                                    <td><%= element.rate %></td>
-                                    <td><%= element.img %></td>
-                                </tr>
-                        <% }) %>
+                        <% user.forEach(element=> { %>
+                            <tr>
+                                <td>
+                                    <%= element.firstName %>
+                                </td>
+                                <td>
+                                    <%= element.lastName %>
+                                </td>
+                                <td>
+                                    <%= element.email %>
+                                </td>
+                                <td>
+                                    <%= element.password %>
+                                </td>`
+                                <td>
+                                    <%= element.mobile %>
+                                </td>
+                                <td>
+                                    <%= element.expertise %>
+                                </td>
+                                <td>
+                                    <%= element.title %>
+                                </td>
+                                <td>
+                                    <%= element.description %>
+                                </td>
+                                <td>
+                                    <%= element.workHistory %>
+                                </td>
+                                <td>
+                                    <%= element.location %>
+                                </td>
+                                <td>
+                                    <%= element.savedJob %>
+                                </td>
+                                <td>
+                                    <%= element.rate %>
+                                </td>
+                                <td>
+                                    <%= element.img %>
+                                </td>
+                                <td>
+                                    <a href="/update-view?id=<%= element._id %>">update</a>
+                                </td>
+                                <td>
+                                    <a href="/user-delete?id=<%= element._id %>">delete</a>
+                                </td>
+                                <td>
+                                    <!-- <a href="./user-block?id=<%= element._id %>">block</a> -->
+                                    <a href="/user-block?id=<%= element._id %>&userBlock=<%= element.userBlock %>">
+                                        <% if (element.userBlock) { %>
+                                            UnBlock
+                                            <% } else { %>block<%}%>
+                                    </a>
+
+                                </td>
+                            </tr>
+                            <% }) %>
                     </tbody>
                 </table>
             </div>
