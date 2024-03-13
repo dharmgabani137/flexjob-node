@@ -140,7 +140,8 @@ async function postList(req, res) {
         currentPage: page,
         nextPage: page + 1 > totalPages ? false : page + 1,
         prevPage: page - 1 >= 1 ? page - 1 : false,
-        message: "success"
+        message: "success",
+        status:true
     })
 
 }
