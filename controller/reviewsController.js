@@ -1,3 +1,4 @@
+const { default: mongoose } = require('mongoose');
 const reviewsModel = require('../models/reviewsModel');
 const joi = require('joi');
 
@@ -28,11 +29,26 @@ async function reviews(req, res) {
 }
 
 async function reviewList(req,res) {
-    var userList = await reviewsModel.find({});
+    var data = req.query;
+    var reviewList = await reviewsModel.aggregate([
+        {$match:{userId : new mongoose.Types.ObjectId(data.id) }},
+        {
+            $lookup: {
+                from: "users",
+                localField: "reviewer",
+                foreignField: "_id",
+                as: "user"
+            }
+        }
+    ]);
     res.json({
-        data : userList
+        userReview : reviewList,
+        status : true
     })
 }
+   
+   
+
 
 module.exports = {
     reviews,

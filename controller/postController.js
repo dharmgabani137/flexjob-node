@@ -237,7 +237,7 @@ async function postDataById(req, res) {
         }
     ]);
 
-    if (!post) {
+    if (!post || post.length == 0) {
         return res.json({
             status: false,
             message: "post not found"
@@ -245,14 +245,14 @@ async function postDataById(req, res) {
     }
     console.log(post, 'post');
     var expertise = await expertiseModel.find({
-        _id: { $in: post[0].expertise }
+        _id: { $in: post[0]?.expertise }
     })
 
     res.json({
         data: {
             ...post[0], expertise: expertise,
-            formattedTime: moment(post[0].createdAt).fromNow(),
-            liked: post[0].likeBy.includes(req.payload._id)
+            formattedTime: moment(post[0]?.createdAt).fromNow(),
+            liked: post[0]?.likeBy.includes(req.payload._id)
         },
         status: true,
     })
@@ -268,15 +268,21 @@ async function saveJobList(req, res) {
             _id: { $in: user.savedJob}
         })  
 
-    
 
-
-    
-    
 
     res.json({
         savedPost: jobs,
         status: true
+    })
+}
+
+async function currentUserPost(req,res) {
+    var currentUser = req.payload._id;
+    var postList = await PostModel.find({userId : currentUser})
+
+    res.json({
+        status : true,
+        currentUserPost : postList
     })
 }
 
@@ -288,6 +294,7 @@ module.exports = {
     likePost,
     savePost,
     postDataById,
-    saveJobList
+    saveJobList,
+    currentUserPost
 }
 
