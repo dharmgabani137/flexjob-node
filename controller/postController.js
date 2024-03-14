@@ -4,6 +4,7 @@ const joi = require('joi');
 const moment = require('moment');
 const UserModel = require('../models/userModels');
 const { default: mongoose } = require('mongoose');
+const e = require('express');
 
 async function post(req, res) {
 
@@ -257,6 +258,28 @@ async function postDataById(req, res) {
     })
 }
 
+async function saveJobList(req, res) {
+    var currentUser = req.payload._id;
+    var user = await UserModel.findOne({_id : currentUser});
+
+   console.log(user.savedJob);
+        
+        var jobs = await PostModel.find({
+            _id: { $in: user.savedJob}
+        })  
+
+    
+
+
+    
+    
+
+    res.json({
+        savedPost: jobs,
+        status: true
+    })
+}
+
 module.exports = {
     post,
     postUpdate,
@@ -264,6 +287,7 @@ module.exports = {
     postList,
     likePost,
     savePost,
-    postDataById
+    postDataById,
+    saveJobList
 }
 

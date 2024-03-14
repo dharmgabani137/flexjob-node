@@ -91,12 +91,7 @@ async function login(req, res) {
     var data = req.body;
     var user = await UserModel.findOne({ email: data.email });
     console.log(user);
-    if (user.userBlock) {
-        res.status(500).json({
-            status: false,
-            message: 'you are blocked'
-        });
-    }
+   
     if (user == null) {
         return res.json({
             status: false,
@@ -104,7 +99,12 @@ async function login(req, res) {
         })
     }
     const passwordMatch = await bcrypt.compare(data.password, user.password);
-
+    if (user.userBlock) {
+       return res.status(500).json({
+            status: false,
+            message: 'you are blocked'
+        });
+    }
 
     if (passwordMatch) {
 
