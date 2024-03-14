@@ -19,7 +19,7 @@ async function post(req, res) {
     var valid = schema.validate(data)
     if (valid?.error) {
         return res.json({
-            status : false,
+            status: false,
             error: valid.error.message
         })
     }
@@ -46,7 +46,7 @@ async function postUpdate(req, res) {
     var valid = schema.validate(data)
     if (valid?.error) {
         return res.json({
-            status : false,
+            status: false,
             error: valid.error.message
         })
     }
@@ -144,7 +144,7 @@ async function postList(req, res) {
         nextPage: page + 1 > totalPages ? false : page + 1,
         prevPage: page - 1 >= 1 ? page - 1 : false,
         message: "success",
-        status:true
+        status: true
     })
 
 }

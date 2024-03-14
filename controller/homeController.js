@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
 const crypto = require('crypto');
 const PostModel = require("../models/postModels");
+var session = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(session);
 
 
 async function adminData(req, res) {
@@ -46,7 +48,9 @@ async function loginPost(req, res) {
 
     if (user == null) {
         res.redirect("/login-admin");
+      
     } else {
+        req.session.user = user
         res.redirect("/dashbord");
     }
 }
@@ -148,6 +152,11 @@ async function userBlock(req,res) {
     res.redirect('/table')
 }
 
+async function adminLogout(req, res) {
+    req.session.user = null;
+    res.redirect('/login-admin')
+}
+
 module.exports = {
     dashbord,
     loginGet,
@@ -159,6 +168,7 @@ module.exports = {
     updateView,
     updateData,
     userDelete,
-    userBlock
+    userBlock,
+    adminLogout
 
 }

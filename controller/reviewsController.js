@@ -27,6 +27,14 @@ async function reviews(req, res) {
 
 }
 
+async function reviewList(req,res) {
+    var userList = await reviewsModel.find({});
+    res.json({
+        data : userList
+    })
+}
+
 module.exports = {
-    reviews
+    reviews,
+    reviewList
 }

@@ -9,9 +9,9 @@ const { proposal, proposalUpdate, proposalByPost, proposalAcceptReject, proposal
 const { employeeData } = require('./controller/employeeController');
 const { employerData } = require('./controller/employerController');
 const { seedData, expertiseData } = require('./controller/expertiseController');
-const { reviews } = require('./controller/reviewsController');
+const { reviews, reviewList } = require('./controller/reviewsController');
 const { sendNotification } = require('./controller/notificationController');
-const { dashbord, loginPost, loginGet, table, adminData, createData, insertData, updateView, updateData, userDelete, userBlock } = require('./controller/homeController');
+const { dashbord, loginPost, loginGet, table, adminData, createData, insertData, updateView, updateData, userDelete, userBlock, adminLogout } = require('./controller/homeController');
 
 const route = express.Router();
 
@@ -28,16 +28,13 @@ const route = express.Router();
 //     })
 // });
 
-// function verify(req, res, next) {
-//     if (req.session?.user) {
-//         return next()
-//     } else {
-//         res.json({
-//             status: false,
-//             message: "Unauthenticated."
-//         })
-//     }
-// }
+function adminVerify(req, res, next) {
+    if (req.session?.user) {
+        return next()
+    } else {
+        res.redirect('/login-admin')
+    }
+}
 
 
 // function verify(req, res, next) {
@@ -96,24 +93,27 @@ route.post('/save-post', verify, savePost);
 route.post('/reviews', verify, reviews);
 route.get('/sendNotification', sendNotification);
 route.get('/user-by-id/:id', employeeDataById);
+route.post('/review-list', verify, reviewList);
+
+
+
+
+
+
+
 route.post('/admin-data', adminData);
-
-
-
-
-
-
-
-route.get('/dashbord', dashbord);
+route.get('/dashbord', adminVerify,dashbord);
 route.get('/login-admin', loginGet);
-route.post('/login-admin', loginPost);
-route.get('/table', table);
-route.get('/create-data', createData);
-route.post('/insert-data', insertData);
-route.get('/update-view', updateView);
-route.post('/update-data', updateData);
-route.get('/user-delete', userDelete);
-route.get('/user-block', userBlock);
+route.post('/login-admin',loginPost);
+route.get('/table', adminVerify,table);
+route.get('/create-data', adminVerify,createData);
+route.post('/insert-data', adminVerify,insertData);
+route.get('/update-view',adminVerify, updateView);
+route.post('/update-data',adminVerify, updateData);
+route.get('/user-delete', adminVerify,userDelete);
+route.get('/user-block',adminVerify, userBlock);
+route.post('/admin-logout',adminLogout);
+
 
 
 
