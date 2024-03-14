@@ -213,7 +213,7 @@ async function update(req, res) {
 
 
 
-    if (req.files.image) {
+    if (req.files?.image) {
         let uploadedFile = req.files.image;
         {
             var img = '/img/' + req.payload.firstName + new Date().getTime() + "." + uploadedFile.mimetype.slice(6)
