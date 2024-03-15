@@ -94,8 +94,8 @@ route.post('/reviews', verify, reviews);
 route.get('/sendNotification', sendNotification);
 route.get('/user-by-id/:id', employeeDataById);
 route.get('/review-list', verify, reviewList);
-route.get('/save-job-list',verify,saveJobList)
-route.get('/current-user-post',verify,currentUserPost)
+route.get('/save-job-list', verify, saveJobList)
+route.get('/current-user-post', verify, currentUserPost)
 
 
 
@@ -104,17 +104,17 @@ route.get('/current-user-post',verify,currentUserPost)
 
 
 route.post('/admin-data', adminData);
-route.get('/dashbord', adminVerify,dashbord);
+route.get('/dashbord', adminVerify, dashbord);
 route.get('/login-admin', loginGet);
-route.post('/login-admin',loginPost);
-route.get('/table', adminVerify,table);
-route.get('/create-data', adminVerify,createData);
-route.post('/insert-data', adminVerify,insertData);
-route.get('/update-view',adminVerify, updateView);
-route.post('/update-data',adminVerify, updateData);
-route.get('/user-delete', adminVerify,userDelete);
-route.get('/user-block',adminVerify, userBlock);
-route.post('/admin-logout',adminLogout);
+route.post('/login-admin', loginPost);
+route.get('/table', adminVerify, table);
+route.get('/create-data', adminVerify, createData);
+route.post('/insert-data', adminVerify, insertData);
+route.get('/update-view', adminVerify, updateView);
+route.post('/update-data', adminVerify, updateData);
+route.get('/user-delete', adminVerify, userDelete);
+route.get('/user-block', adminVerify, userBlock);
+route.post('/admin-logout', adminLogout);
 
 
 
