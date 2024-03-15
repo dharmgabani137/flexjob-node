@@ -96,7 +96,7 @@ route.get('/user-by-id/:id', employeeDataById);
 route.get('/review-list', verify, reviewList);
 route.get('/save-job-list',verify,saveJobList)
 route.get('/current-user-post',verify,currentUserPost);
-route.get('/post-list-by-user-id/:id',postListByUserId)
+route.get('/post-list-by-user-id/:id',verify    ,postListByUserId)
 
 
 

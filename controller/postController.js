@@ -119,7 +119,7 @@ async function postList(req, res) {
     if (ex) {
         var expertise = await expertiseModel.find({ technology: { $regex: ex, $options: 'i' } }, { _id: 1 });
         var eId = expertise.map(e => e._id.toString())
-        
+
         aggregate.push({
             $match: { expertise: { $elemMatch: { $in: eId } } }
         })
@@ -326,11 +326,36 @@ async function currentUserPost(req, res) {
 }
 async function postListByUserId(req, res) {
     try {
-        console.log(req.params.id,'gfggfffg');
-        var postList = await PostModel.find({ userId: req.params.id });
+        var postList = await PostModel.aggregate([
+
+            { $match: { userId: new mongoose.Types.ObjectId(req.params.id) } },
+
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            }
+
+        ]); var newD = await Promise.all(postList.map(async (v) => ({
+            ...v, //spread
+            formattedTime: moment(v.createdAt).fromNow(),
+            expertise: await expertiseModel.find({
+                _id: { $in: v.expertise }
+    
+            }),
+            liked: v.likeBy.includes(req.payload._id)
+        })))
+    
+        
+        
+
+
         res.json({
             status: true,
-            data: postList
+            data: newD
         });
     } catch (error) {
         res.status(500).json({
