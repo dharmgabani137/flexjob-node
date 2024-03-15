@@ -245,6 +245,7 @@ async function postDataById(req, res) {
         }
     ]);
 
+
     if (!post || post.length == 0) {
         return res.json({
             status: false,
@@ -255,6 +256,16 @@ async function postDataById(req, res) {
     var expertise = await expertiseModel.find({
         _id: { $in: post[0]?.expertise }
     })
+
+    var newD = await Promise.all(user.map(async (v) => ({
+        ...v, //spread
+        formattedTime: moment(v.createdAt).fromNow(),
+        expertise: await expertiseModel.find({
+            _id: { $in: v.expertise }
+
+        }),
+        liked: v.likeBy.includes(req.payload._id)
+    })))
 
     res.json({
         data: {
@@ -270,16 +281,36 @@ async function saveJobList(req, res) {
     var currentUser = req.payload._id;
     var user = await UserModel.findOne({ _id: currentUser });
 
+    // console.log(user);
+
     console.log(user.savedJob);
 
-    var jobs = await PostModel.find({
-        _id: { $in: user.savedJob }
-    })
+    var sId = user.savedJob.map(e => new mongoose.Types.ObjectId(e))
 
+    var jobs = await PostModel.aggregate([
+        { $match: { _id: { $in: sId } } },
+        {
+            $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "user"
+            }
+        }
+    ])
 
+    var newD = await Promise.all(jobs.map(async (v) => ({
+        ...v, //spread
+        formattedTime: moment(v.createdAt).fromNow(),
+        expertise: await expertiseModel.find({
+            _id: { $in: v.expertise }
+
+        }),
+        liked: v.likeBy.includes(req.payload._id)
+    })))
 
     res.json({
-        savedPost: jobs,
+        savedPost: newD,
         status: true
     })
 }

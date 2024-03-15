@@ -105,17 +105,17 @@ route.get('/post-list-by-user-id/:id',postListByUserId)
 
 
 route.post('/admin-data', adminData);
-route.get('/dashbord', adminVerify,dashbord);
+route.get('/dashbord', adminVerify, dashbord);
 route.get('/login-admin', loginGet);
-route.post('/login-admin',loginPost);
-route.get('/table', adminVerify,table);
-route.get('/create-data', adminVerify,createData);
-route.post('/insert-data', adminVerify,insertData);
-route.get('/update-view',adminVerify, updateView);
-route.post('/update-data',adminVerify, updateData);
-route.get('/user-delete', adminVerify,userDelete);
-route.get('/user-block',adminVerify, userBlock);
-route.post('/admin-logout',adminLogout);
+route.post('/login-admin', loginPost);
+route.get('/table', adminVerify, table);
+route.get('/create-data', adminVerify, createData);
+route.post('/insert-data', adminVerify, insertData);
+route.get('/update-view', adminVerify, updateView);
+route.post('/update-data', adminVerify, updateData);
+route.get('/user-delete', adminVerify, userDelete);
+route.get('/user-block', adminVerify, userBlock);
+route.post('/admin-logout', adminLogout);
 
 
 
