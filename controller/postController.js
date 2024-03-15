@@ -221,52 +221,55 @@ async function savePost(req, res) {
 async function postDataById(req, res) {
     console.log(req.params, 'req.params.id');
 
-    var post = await PostModel.aggregate([
-        {
-            $match: {
-                _id: new mongoose.Types.ObjectId(req.params.id)
+    try {
+        var post = await PostModel.aggregate([
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(req.params.id)
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user"
+                }
             }
-        },
-        {
-            $lookup: {
-                from: "users",
-                localField: "userId",
-                foreignField: "_id",
-                as: "user"
-            }
+        ]);
+
+
+        if (!post || post.length == 0) {
+            return res.json({
+                status: false,
+                message: "post not found"
+            })
         }
-    ]);
+        console.log(post, 'post');
 
+        var newD = await Promise.all(post.map(async (v) => ({
+            ...v, //spread
+            formattedTime: moment(v.createdAt).fromNow(),
+            expertise: await expertiseModel.find({
+                _id: { $in: v.expertise }
 
-    if (!post || post.length == 0) {
-        return res.json({
+            }),
+            liked: v.likeBy.includes(req.payload._id)
+        })))
+
+        res.json({
+            data: newD[0],
+            status: true,
+        })
+
+    } catch (error) {
+        console.log(error);
+        res.json({
+            message: error,
             status: false,
-            message: "post not found"
         })
     }
-    console.log(post, 'post');
-    var expertise = await expertiseModel.find({
-        _id: { $in: post[0]?.expertise }
-    })
 
-    var newD = await Promise.all(user.map(async (v) => ({
-        ...v, //spread
-        formattedTime: moment(v.createdAt).fromNow(),
-        expertise: await expertiseModel.find({
-            _id: { $in: v.expertise }
-
-        }),
-        liked: v.likeBy.includes(req.payload._id)
-    })))
-
-    res.json({
-        data: {
-            ...post[0], expertise: expertise,
-            formattedTime: moment(post[0]?.createdAt).fromNow(),
-            liked: post[0]?.likeBy.includes(req.payload._id)
-        },
-        status: true,
-    })
 }
 
 async function saveJobList(req, res) {
