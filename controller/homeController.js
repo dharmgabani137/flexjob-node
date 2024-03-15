@@ -10,33 +10,50 @@ var MongoDBStore = require('connect-mongodb-session')(session);
 
 
 async function adminData(req, res) {
-    var data = req.body;
+    try {
+        var data = req.body;
 
-    var user = await adminModel.create({ type: data.type, email: data.email, password: data.password });
+        var user = await adminModel.create({ type: data.type, email: data.email, password: data.password });
 
-    res.json({
-        message: "added",
-        data: user,
-        status : true
-    
-    })
+        res.json({
+            message: "added",
+            data: user,
+            status: true
+
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            error: error.message
+        });
+    }
 
 }
 
 async function dashbord(req, res) {
-    var userCount = await UserModel.find({});
-    var postCount = await PostModel.find({});
-   userTotal = userCount.length;
-   postTotal = postCount.length;
-
-    res.render('dashbord', {userTotal,postTotal});
+    try {
+        var userCount = await UserModel.find({});
+        var postCount = await PostModel.find({});
+        userTotal = userCount.length;
+        postTotal = postCount.length;
+    
+        res.render('dashbord', { userTotal, postTotal });
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            error: error.message
+        });
+    }
+   
 }
 
 function loginGet(req, res) {
     res.render('pages/login', { layout: "layout/authlayout/authlayout" })
 }
 async function loginPost(req, res) {
-    let data = req.body;
+    try {
+        let data = req.body;
     var user = await adminModel.findOne({
         email: data.email,
         password: data.password,
@@ -48,11 +65,18 @@ async function loginPost(req, res) {
 
     if (user == null) {
         res.redirect("/login-admin");
-      
+
     } else {
         req.session.user = user
         res.redirect("/dashbord");
     }
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            error: error.message
+        });
+    }
+    
 }
 
 async function table(req, res) {
@@ -63,7 +87,8 @@ async function createData(req, res) {
     res.render('createData')
 }
 async function insertData(req, res) {
-    var data = req.body;
+    try {
+        var data = req.body;
     console.log(data);
     // Check if the 'password' field is present in the request data
     if (!data.password) {
@@ -107,17 +132,25 @@ async function insertData(req, res) {
         })
     }
 
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            error: error.message
+        });
+    }
+    
 }
 
 async function updateView(req, res) {
-    
+
     var user = await UserModel.findOne({ _id: req.query.id });
     res.render('updateview', { user })
 }
 async function updateData(req, res) {
-    var data = req.body;
+    try {
+        var data = req.body;
     const hashedPassword = await bcrypt.hash(data.password, 10);
-    var user = await UserModel.updateOne({_id : data.id},{
+    var user = await UserModel.updateOne({ _id: data.id }, {
         type: data.type,
         firstName: data.firstName,
         lastName: data.lastName,
@@ -133,19 +166,26 @@ async function updateData(req, res) {
         rate: data.rate,
     })
     res.redirect('/table')
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            error: error.message
+        });
+    }
+    
 }
-async function userDelete(req,res) {
-    var deleteUser = await UserModel.deleteOne({_id : req.query.id});
+async function userDelete(req, res) {
+    var deleteUser = await UserModel.deleteOne({ _id: req.query.id });
     console.log(deleteUser);
     res.redirect('/table')
 }
-async function userBlock(req,res) {
-    if(req.query.userBlock === 'true'){
-        var blockUser = await UserModel.updateOne({_id : req.query.id},{
+async function userBlock(req, res) {
+    if (req.query.userBlock === 'true') {
+        var blockUser = await UserModel.updateOne({ _id: req.query.id }, {
             userBlock: false
         });
-    }else {
-        var blockUser = await UserModel.updateOne({_id : req.query.id},{
+    } else {
+        var blockUser = await UserModel.updateOne({ _id: req.query.id }, {
             userBlock: true
         });
     }

@@ -1,8 +1,7 @@
 const UserModel = require("../models/userModels");
 async function employerData(req, res) {
-
-    // pagination
-    const page = parseInt(req.query.page || 1);
+    try {
+        const page = parseInt(req.query.page || 1);
     const limit = parseInt(req.query.limit || 3);
     // Number of items per page
     var skip = (page - 1) * limit;
@@ -21,6 +20,15 @@ async function employerData(req, res) {
         message: "success"
     });
 
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            error: error.message
+        });
+    }
+
+    // pagination
+    
 }
 
 module.exports = {

@@ -3,7 +3,8 @@ const reviewsModel = require('../models/reviewsModel');
 const joi = require('joi');
 
 async function reviews(req, res) {
-    var data = req.body;
+    try {
+        var data = req.body;
     const schema = joi.object().keys({
         userId: joi.string().required(),
         reviewer : joi.string(),
@@ -25,26 +26,41 @@ async function reviews(req, res) {
         })
 
     }
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            error: error.message
+        });
+    }
+    
 
 }
 
 async function reviewList(req,res) {
-    var data = req.query;
-    var reviewList = await reviewsModel.aggregate([
-        {$match:{userId : new mongoose.Types.ObjectId(data.id) }},
-        {
-            $lookup: {
-                from: "users",
-                localField: "reviewer",
-                foreignField: "_id",
-                as: "user"
+    try {
+        var data = req.query;
+        var reviewList = await reviewsModel.aggregate([
+            {$match:{userId : new mongoose.Types.ObjectId(data.id) }},
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "reviewer",
+                    foreignField: "_id",
+                    as: "user"
+                }
             }
-        }
-    ]);
-    res.json({
-        userReview : reviewList,
-        status : true
-    })
+        ]);
+        res.json({
+            userReview : reviewList,
+            status : true
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            error: error.message
+        });
+    }
+   
 }
    
    
