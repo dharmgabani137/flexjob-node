@@ -89,8 +89,8 @@ async function postDelete(req, res) {
 
 async function postList(req, res) {
 
-    const searchQuery = req.query.s;
-    const search = req.query.e;
+    const searchQuery = req.query?.s;
+    const ex = req.query?.e;
 
     // pagination
     const page = parseInt(req.query.page || 1);
@@ -116,6 +116,15 @@ async function postList(req, res) {
         aggregate.push({ $match: { $or: [{ title: { $regex: searchQuery, $options: 'i' } }, { description: { $regex: searchQuery, $options: 'i' } }] } })
     }
 
+    if (ex) {
+        var expertise = await expertiseModel.find({ technology: { $regex: ex, $options: 'i' } }, { _id: 1 });
+        var eId = expertise.map(e => e._id.toString())
+        
+        aggregate.push({
+            $match: { expertise: { $elemMatch: { $in: eId } } }
+        })
+    }
+
 
     var count = await PostModel.aggregate([...aggregate, { $count: "total" }])
 
@@ -123,7 +132,7 @@ async function postList(req, res) {
     aggregate.push({ $limit: limit })
 
     var user = await PostModel.aggregate(aggregate)
-    console.log(aggregate, 'aggregate');
+    // console.log(aggregate, 'aggregate');
 
 
     var newD = await Promise.all(user.map(async (v) => ({
@@ -136,7 +145,7 @@ async function postList(req, res) {
         liked: v.likeBy.includes(req.payload._id)
     })))
 
-    var totalPages = Math.ceil(count[0].total / limit)
+    var totalPages = Math.ceil(count[0]?.total / limit)
 
     res.json({
         data: newD,
@@ -219,7 +228,6 @@ async function savePost(req, res) {
 }
 
 async function postDataById(req, res) {
-    console.log(req.params, 'req.params.id');
 
     var post = await PostModel.aggregate([
         {
@@ -260,13 +268,13 @@ async function postDataById(req, res) {
 
 async function saveJobList(req, res) {
     var currentUser = req.payload._id;
-    var user = await UserModel.findOne({_id : currentUser});
+    var user = await UserModel.findOne({ _id: currentUser });
 
-   console.log(user.savedJob);
-        
-        var jobs = await PostModel.find({
-            _id: { $in: user.savedJob}
-        })  
+    console.log(user.savedJob);
+
+    var jobs = await PostModel.find({
+        _id: { $in: user.savedJob }
+    })
 
 
 
@@ -276,15 +284,32 @@ async function saveJobList(req, res) {
     })
 }
 
-async function currentUserPost(req,res) {
+async function currentUserPost(req, res) {
     var currentUser = req.payload._id;
-    var postList = await PostModel.find({userId : currentUser})
+    var postList = await PostModel.find({ userId: currentUser })
 
     res.json({
-        status : true,
-        currentUserPost : postList
+        status: true,
+        currentUserPost: postList
     })
 }
+async function postListByUserId(req, res) {
+    try {
+        console.log(req.params.id,'gfggfffg');
+        var postList = await PostModel.find({ userId: req.params.id });
+        res.json({
+            status: true,
+            data: postList
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            message: "An error occurred while fetching post list",
+            error: error.message
+        });
+    }
+}
+
 
 module.exports = {
     post,
@@ -295,6 +320,7 @@ module.exports = {
     savePost,
     postDataById,
     saveJobList,
-    currentUserPost
+    currentUserPost,
+    postListByUserId
 }
 

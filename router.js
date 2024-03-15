@@ -4,7 +4,7 @@ const loginModel = require("./models/loginModel");
 // const UserModel = require("./models/userModels");
 // const multer = require('multer');
 const { registerPost, login, logout, update, profile, forgetPass, sendEmail, resetPass, employeeDataById } = require('./controller/authController');
-const { post, postUpdate, postDelete, postList, likePost, savePost, postDataById, saveJobList, currentUserPost } = require('./controller/postController');
+const { post, postUpdate, postDelete, postList, likePost, savePost, postDataById, saveJobList, currentUserPost, postListByUserId } = require('./controller/postController');
 const { proposal, proposalUpdate, proposalByPost, proposalAcceptReject, proposalByUser } = require('./controller/proposalController');
 const { employeeData } = require('./controller/employeeController');
 const { employerData } = require('./controller/employerController');
@@ -95,7 +95,8 @@ route.get('/sendNotification', sendNotification);
 route.get('/user-by-id/:id', employeeDataById);
 route.get('/review-list', verify, reviewList);
 route.get('/save-job-list',verify,saveJobList)
-route.get('/current-user-post',verify,currentUserPost)
+route.get('/current-user-post',verify,currentUserPost);
+route.get('/post-list-by-user-id/:id',postListByUserId)
 
 
 
