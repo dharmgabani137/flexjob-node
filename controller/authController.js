@@ -15,127 +15,145 @@ const { start } = require("repl");
 
 
 async function registerPost(req, res) {
-    var data = req.body;
-    // Check if the 'password' field is present in the request data
-    if (!data.password) {
-        return res.json({
+    try {
+        var data = req.body;
+        // Check if the 'password' field is present in the request data
+        if (!data.password) {
+            return res.json({
+                status: false,
+                message: 'Password is required'
+            });
+        }
+    
+        const schema = joi.object().keys({
+            type: joi.string(),
+            firstName: joi.string().alphanum().min(3).max(30),
+            lastName: joi.string().alphanum().min(3).max(30),
+            email: joi.string().email(),
+            password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
+            mobile: joi.string().regex(/^[0-9]{10}$/),
+            expertise: joi.array(),
+            // language: joi.array().required(),
+            title: joi.string(),
+            description: joi.string(),
+            workHistory: joi.array(),
+            location: joi.string(),
+            savedJob: joi.array(),
+            rate: joi.string()
+        });
+    
+        const hashedPassword = await bcrypt.hash(data.password, 10);
+        var valid = schema.validate(data);
+    
+    
+        if (valid?.error) {
+            console.log(valid.error.message);
+            return res.json({
+                error: valid.error.message,
+                status: false
+            })
+        }
+    
+        var checkEmail = await UserModel.findOne({ email: data.email });
+        if (checkEmail == null) {
+            var user = await UserModel.create({
+                type: data.type,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                password: hashedPassword,
+                mobile: data.mobile,
+                expertise: data.expertise,
+                // language: data.language,
+                title: data.title,
+                description: data.description,
+                workHistory: data.workHistory,
+                location: data.location,
+                savedJob: data.savedJob,
+                rate: data.rate,
+                img: '/avatar.jpg'
+            })
+    
+            res.json({
+                status: true,
+                message: 'register successfully'
+            });
+        }
+        else {
+            res.json({
+                status: false,
+                message: 'user already exists'
+            })
+        }
+        
+    } catch (error) {
+        res.status(500).json({
             status: false,
-            message: 'Password is required'
+            error: error.message
         });
     }
-
-    const schema = joi.object().keys({
-        type: joi.string(),
-        firstName: joi.string().alphanum().min(3).max(30),
-        lastName: joi.string().alphanum().min(3).max(30),
-        email: joi.string().email(),
-        password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
-        mobile: joi.string().regex(/^[0-9]{10}$/),
-        expertise: joi.array(),
-        // language: joi.array().required(),
-        title: joi.string(),
-        description: joi.string(),
-        workHistory: joi.array(),
-        location: joi.string(),
-        savedJob: joi.array(),
-        rate: joi.string()
-    });
-
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-    var valid = schema.validate(data);
-
-
-    if (valid?.error) {
-        console.log(valid.error.message);
-        return res.json({
-            error: valid.error.message,
-            status: false
-        })
-    }
-
-    var checkEmail = await UserModel.findOne({ email: data.email });
-    if (checkEmail == null) {
-        var user = await UserModel.create({
-            type: data.type,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            email: data.email,
-            password: hashedPassword,
-            mobile: data.mobile,
-            expertise: data.expertise,
-            // language: data.language,
-            title: data.title,
-            description: data.description,
-            workHistory: data.workHistory,
-            location: data.location,
-            savedJob: data.savedJob,
-            rate: data.rate,
-            img: '/avatar.jpg'
-        })
-
-        res.json({
-            status: true,
-            message: 'register successfully'
-        });
-    }
-    else {
-        res.json({
-            status: false,
-            message: 'user already exists'
-        })
-    }
+   
+   
 
 }
 
 async function login(req, res) {
-    var data = req.body;
-    var user = await UserModel.findOne({ email: data.email });
-    console.log(user);
+    try {
+        var data = req.body;
+        var user = await UserModel.findOne({ email: data.email });
+        console.log(user);
+       
+        if (user == null) {
+            return res.json({
+                status: false,
+                message: 'invalid emailId'
+            })
+        }
+        const passwordMatch = await bcrypt.compare(data.password, user.password);
+        if (user.userBlock) {
+           return res.status(500).json({
+                status: false,
+                message: 'you are blocked'
+            });
+        }
+    
+        if (passwordMatch) {
+    
+            const token = jwt.sign({
+                _id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                password: user.Password,
+                mobile: user.mobile,
+                expertise: user.expertise,
+                title: user.title,
+                description: user.description,
+                workHistory: user.workHistory,
+                location: user.location,
+                savedJob: user.savedJob,
+                rate: user.rate,
+            }, 'your_secret_key', { expiresIn: '1w' });
+            await loginModel.create({ userId: user._id, token: token });
+            return res.json({
+                status: true,
+                token: token,
+                message: 'Login successful'
+            });
+    
+        } else {
+            return res.json({
+                status: false,
+                message: 'Invalid email or password'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            error: error.message
+        });
+    }
    
-    if (user == null) {
-        return res.json({
-            status: false,
-            message: 'invalid emailId'
-        })
-    }
-    const passwordMatch = await bcrypt.compare(data.password, user.password);
-    if (user.userBlock) {
-       return res.status(500).json({
-            status: false,
-            message: 'you are blocked'
-        });
-    }
-
-    if (passwordMatch) {
-
-        const token = jwt.sign({
-            _id: user._id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            password: user.Password,
-            mobile: user.mobile,
-            expertise: user.expertise,
-            title: user.title,
-            description: user.description,
-            workHistory: user.workHistory,
-            location: user.location,
-            savedJob: user.savedJob,
-            rate: user.rate,
-        }, 'your_secret_key', { expiresIn: '1w' });
-        await loginModel.create({ userId: user._id, token: token });
-        return res.json({
-            status: true,
-            token: token,
-            message: 'Login successful'
-        });
-
-    } else {
-        return res.json({
-            status: false,
-            message: 'Invalid email or password'
-        });
-    }
 }
 
 // function logout(req, res) {
@@ -163,8 +181,8 @@ async function logout(req, res) {
 }
 
 async function profile(req, res) {
-
-    // var currentUser = req.session.user;
+    try {
+        // var currentUser = req.session.user;
     var user = await UserModel.findOne({ _id: req.payload._id }, { 'firstName': 1, 'lastName': 1, 'email': 1, 'mobile': 1, 'expertise': 1, 'language': 1, 'title': 1, 'description': 1, 'workHistory': 1, 'location': 1, 'savedJob': 1, 'rate': 1, 'img': 1 });
     var createLink = "http://127.0.0.1:4000" + user.img;
     var reviews = await reviewsModel.find({ userId: req.payload._id });
@@ -178,10 +196,19 @@ async function profile(req, res) {
         reviews: reviews,
         status: true,
     })
+    } catch (error) {
+        
+    }res.status(500).json({
+        status: false,
+        error: error.message
+    });
+
+    
 }
 
 async function update(req, res) {
-    const userId = req.payload._id;
+    try {
+        const userId = req.payload._id;
     var data = req.body;
     console.log(data);
     const schema = joi.object().keys({
@@ -256,24 +283,39 @@ async function update(req, res) {
             message: 'update successfully'
         })
     }
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            error: error.message
+        });
+    }
+    
 };
 
 async function sendEmail(email, subject, text) {
-    const transporter = nodemailer.createTransport({
-        host: "sandbox.smtp.mailtrap.io",
-        // service: process.env.SERVICE,
-        port: 2525,
-        auth: {
-            user: "aad4eed98d6747",
-            pass: "9ad860e39d32be",
-        },
-    });
-    await transporter.sendMail({
-        from: "dharmgabani6@gmail.com",
-        to: email,
-        subject: subject,
-        text: text,
-    });
+    try {
+        const transporter = nodemailer.createTransport({
+            host: "sandbox.smtp.mailtrap.io",
+            // service: process.env.SERVICE,
+            port: 2525,
+            auth: {
+                user: "aad4eed98d6747",
+                pass: "9ad860e39d32be",
+            },
+        });
+        await transporter.sendMail({
+            from: "dharmgabani6@gmail.com",
+            to: email,
+            subject: subject,
+            text: text,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            error: error.message
+        });
+    }
+    
 
 }
 
@@ -361,12 +403,22 @@ async function resetPass(req, res) {
 
 
 async function employeeDataById(req, res) {
+    try {
+        
     var user = await UserModel.findOne({ _id: req.params.id });
     res.json({
         data: user,
         status: true
     })
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            error: error.message
+        });
+    }
 }
+
+
 
 module.exports = {
     registerPost,
