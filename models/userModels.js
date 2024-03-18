@@ -34,10 +34,6 @@ var userSchema = new mongoose.Schema({
         type : Array,
         require : true
     },
-    // language : {
-    //     type : Array,
-    //     require : true
-    // },
     title : {
         type : String,
         require : true
