@@ -1,7 +1,7 @@
 const PostModel = require('../models/postModels');
 const ProposalModel = require('../models/proposalModels');
 const joi = require('joi');
-const {sendNotification} = require('./notificationController')
+const { sendNotification } = require('./notificationController')
 
 async function proposal(req, res) {
     try {
@@ -15,7 +15,7 @@ async function proposal(req, res) {
         var valid = schema.validate(data);
 
         var user = await ProposalModel.create({ postId: data.postId, userId: req.payload._id, description: data.description, bidAmount: data.bidAmount, status: data.status });
-        sendNotification(req.payload._id,"proposal","new proposal");
+        sendNotification(req.payload._id, "proposal", "new proposal");
         res.json({
             status: true,
             message: "created successfully"
@@ -82,7 +82,10 @@ async function proposalByPost(req, res) {
         const skipValue = req.query.skip || 0;
         const posts = await ProposalModel.find({ postId: data.postId })
             .limit(limitValue).skip(skipValue);
-        res.status(200).send(posts);
+        res.send({
+            data: posts,
+            status: true
+        });
     } catch (e) {
         console.log(e);
     }
