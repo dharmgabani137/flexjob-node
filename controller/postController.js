@@ -310,7 +310,7 @@ async function postDataById(req, res) {
             _id: { $in: post[0]?.expertise }
         })
 
-        var newD = await Promise.all(user.map(async (v) => ({
+        var newD = await Promise.all(post.map(async (v) => ({
             ...v, //spread
             formattedTime: moment(v.createdAt).fromNow(),
             expertise: await expertiseModel.find({

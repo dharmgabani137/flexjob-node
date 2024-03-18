@@ -82,7 +82,10 @@ async function proposalByPost(req, res) {
         const skipValue = req.query.skip || 0;
         const posts = await ProposalModel.find({ postId: data.postId })
             .limit(limitValue).skip(skipValue);
-        res.status(200).send(posts);
+        res.send({
+            data: posts,
+            status: true
+        });
     } catch (e) {
         console.log(e);
     }

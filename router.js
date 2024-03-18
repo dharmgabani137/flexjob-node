@@ -12,6 +12,7 @@ const { seedData, expertiseData } = require('./controller/expertiseController');
 const { reviews, reviewList } = require('./controller/reviewsController');
 const { notificationList } = require('./controller/notificationController');
 const { dashbord, loginPost, loginGet, table, adminData, createData, insertData, updateView, updateData, userDelete, userBlock, adminLogout } = require('./controller/homeController');
+const { seed } = require('./seed/seed');
 
 const route = express.Router();
 
@@ -94,15 +95,15 @@ route.post('/reviews', verify, reviews);
 route.get('/notification-list', notificationList);
 route.get('/user-by-id/:id', employeeDataById);
 route.get('/review-list', verify, reviewList);
-route.get('/save-job-list',verify,saveJobList)
-route.get('/current-user-post',verify,currentUserPost);
-route.get('/post-list-by-user-id/:id',verify ,postListByUserId);
-route.get('/payment', (req,res)=>{
+route.get('/save-job-list', verify, saveJobList)
+route.get('/current-user-post', verify, currentUserPost);
+route.get('/post-list-by-user-id/:id', verify, postListByUserId);
+route.get('/payment', (req, res) => {
     res.render('payment')
 });
 
 
-
+route.get('/seed', seed);
 
 
 
