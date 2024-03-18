@@ -22,7 +22,7 @@ async function post(req, res) {
         if (valid?.error) {
             return res.json({
                 status: false,
-                error: valid.error.message
+                message: valid.error.message
             })
         }
         console.log(req.payload);
@@ -34,7 +34,7 @@ async function post(req, res) {
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -58,7 +58,7 @@ async function postUpdate(req, res) {
         if (valid?.error) {
             return res.json({
                 status: false,
-                error: valid.error.message
+                message: valid.error.message
             })
         }
         var user = await PostModel.updateOne({ _id: data.id }, { userId: data.userId, budget: data.budget, status: data.status });
@@ -77,7 +77,7 @@ async function postUpdate(req, res) {
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -105,7 +105,7 @@ async function postDelete(req, res) {
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -185,7 +185,7 @@ async function postList(req, res) {
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -230,7 +230,7 @@ async function likePost(req, res) {
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -274,7 +274,7 @@ async function savePost(req, res) {
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -331,7 +331,7 @@ async function postDataById(req, res) {
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -377,7 +377,7 @@ async function saveJobList(req, res) {
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -395,7 +395,7 @@ async function currentUserPost(req, res) {
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -432,7 +432,7 @@ async function postListByUserId(req, res) {
         res.status(500).json({
             status: false,
             message: "An error occurred while fetching post list",
-            error: error.message
+            message: error.message
         });
     }
 }

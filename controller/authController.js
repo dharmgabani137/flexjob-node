@@ -24,7 +24,7 @@ async function registerPost(req, res) {
                 message: 'Password is required'
             });
         }
-    
+
         const schema = joi.object().keys({
             type: joi.string(),
             firstName: joi.string().alphanum().min(3).max(30),
@@ -41,19 +41,19 @@ async function registerPost(req, res) {
             savedJob: joi.array(),
             rate: joi.string()
         });
-    
+
         const hashedPassword = await bcrypt.hash(data.password, 10);
         var valid = schema.validate(data);
-    
-    
+
+
         if (valid?.error) {
             console.log(valid.error.message);
             return res.json({
-                error: valid.error.message,
+                message: valid.error.message,
                 status: false
             })
         }
-    
+
         var checkEmail = await UserModel.findOne({ email: data.email });
         if (checkEmail == null) {
             var user = await UserModel.create({
@@ -73,7 +73,7 @@ async function registerPost(req, res) {
                 rate: data.rate,
                 img: '/avatar.jpg'
             })
-    
+
             res.json({
                 status: true,
                 message: 'register successfully'
@@ -85,15 +85,15 @@ async function registerPost(req, res) {
                 message: 'user already exists'
             })
         }
-        
+
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
-   
-   
+
+
 
 }
 
@@ -102,7 +102,7 @@ async function login(req, res) {
         var data = req.body;
         var user = await UserModel.findOne({ email: data.email });
         console.log(user);
-       
+
         if (user == null) {
             return res.json({
                 status: false,
@@ -111,14 +111,14 @@ async function login(req, res) {
         }
         const passwordMatch = await bcrypt.compare(data.password, user.password);
         if (user.userBlock) {
-           return res.status(500).json({
+            return res.status(500).json({
                 status: false,
                 message: 'you are blocked'
             });
         }
-    
+
         if (passwordMatch) {
-    
+
             const token = jwt.sign({
                 _id: user._id,
                 firstName: user.firstName,
@@ -140,7 +140,7 @@ async function login(req, res) {
                 token: token,
                 message: 'Login successful'
             });
-    
+
         } else {
             return res.json({
                 status: false,
@@ -150,10 +150,10 @@ async function login(req, res) {
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
-   
+
 }
 
 // function logout(req, res) {
@@ -183,113 +183,116 @@ async function logout(req, res) {
 async function profile(req, res) {
     try {
         // var currentUser = req.session.user;
-    var user = await UserModel.findOne({ _id: req.payload._id }, { 'firstName': 1, 'lastName': 1, 'email': 1, 'mobile': 1, 'expertise': 1, 'language': 1, 'title': 1, 'description': 1, 'workHistory': 1, 'location': 1, 'savedJob': 1, 'rate': 1, 'img': 1 });
-    var createLink = "http://127.0.0.1:4000" + user.img;
-    var reviews = await reviewsModel.find({ userId: req.payload._id });
-    var avarageReview = 0;
-    reviews.forEach(element => {
-        avarageReview += ((element.star) / reviews.length);
-    });
+        var user = await UserModel.findOne({ _id: req.payload._id }, { 'firstName': 1, 'lastName': 1, 'email': 1, 'mobile': 1, 'expertise': 1, 'language': 1, 'title': 1, 'description': 1, 'workHistory': 1, 'location': 1, 'savedJob': 1, 'rate': 1, 'img': 1 });
+        var createLink = "http://127.0.0.1:4000" + user.img;
+        var reviews = await reviewsModel.find({ userId: req.payload._id });
+        var avarageReview = 0;
+        reviews.forEach(element => {
+            avarageReview += ((element.star) / reviews.length);
+        });
 
-    res.json({
-        userData: { ...user._doc, link: createLink, avarageReview: avarageReview },
-        reviews: reviews,
-        status: true,
-    })
+        res.json({
+            userData: { ...user._doc, link: createLink, avarageReview: avarageReview },
+            reviews: reviews,
+            status: true,
+        })
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
-    
+
 }
 
 async function update(req, res) {
     try {
         const userId = req.payload._id;
-    var data = req.body;
-    console.log(data);
-    const schema = joi.object().keys({
-        firstName: joi.string().alphanum().min(3).max(30),
-        lastName: joi.string().alphanum().min(3).max(30),
-        // email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
-        password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
-        mobile: joi.string().regex(/^[0-9]{10}$/),
-        expertise: joi.array(),
-        title: joi.string(),
-        description: joi.string(),
-        // workHistory: joi.array(),
-        location: joi.string(),
-        // savedJob: joi.array(),
-        rate: joi.string()
-    });
-    var valid = schema.validate(data);
-    if (valid?.error) {
-        return res.json({
-            error: valid.error.message,
-            status: false
-        })
-    }
-
-    //     return res.status(400).json({ message: 'No files were uploaded.' });
-    // }
-
-    // The name of the input field (e.g. "avatar") is used to retrieve the uploaded file
-
-
-
-    if (req.files?.image) {
-        let uploadedFile = req.files.image;
-        {
-            var img = '/img/' + req.payload.firstName + new Date().getTime() + "." + uploadedFile.mimetype.slice(6)
-
-            // Use the mv() method to place the file somewhere on your server'
-            uploadedFile.mv('./public' + img, function (err) {
-                if (err) return res.status(500).send(err);
-                // File uploaded successfully
-            });
-            data.img = img
+        var data = req.body;
+        console.log(data);
+        const schema = joi.object().keys({
+            firstName: joi.string().alphanum().min(3).max(30),
+            lastName: joi.string().alphanum().min(3).max(30),
+            // email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
+            password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
+            mobile: joi.string().regex(/^[0-9]{10}$/),
+            expertise: joi.array(),
+            title: joi.string(),
+            description: joi.string(),
+            // workHistory: joi.array(),
+            location: joi.string(),
+            // savedJob: joi.array(),
+            rate: joi.string()
+        });
+        var valid = schema.validate(data);
+        if (valid?.error) {
+            return res.json({
+                message: valid.error.message,
+                status: false
+            })
         }
-        var findUser = await UserModel.findOne({ _id: req.payload._id });
-        if (findUser.img) {
-            fs.unlink('./public' + findUser.img, (err) => {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                console.log('File deleted successfully');
-            });
+
+        //     return res.status(400).json({ message: 'No files were uploaded.' });
+        // }
+
+        // The name of the input field (e.g. "avatar") is used to retrieve the uploaded file
+
+
+
+        if (req.files?.image) {
+            let uploadedFile = req.files.image;
+            {
+                var img = '/img/' + req.payload.firstName + new Date().getTime() + "." + uploadedFile.mimetype.slice(6)
+
+                // Use the mv() method to place the file somewhere on your server'
+                uploadedFile.mv('./public' + img, function (err) {
+                    if (err) return res.status(500).json({
+                        message: err,
+                        status: false
+                    });
+                    // File uploaded successfully
+                });
+                data.img = img
+            }
+            var findUser = await UserModel.findOne({ _id: req.payload._id });
+            if (findUser.img) {
+                fs.unlink('./public' + findUser.img, (err) => {
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+                    console.log('File deleted successfully');
+                });
+            }
         }
-    }
 
 
 
 
 
-    var user1 = await UserModel.updateOne({ _id: userId }, data);
+        var user1 = await UserModel.updateOne({ _id: userId }, data);
 
 
-    if (user1.modifiedCount == 0) {
-        res.json({
-            status: false,
-            message: "not updated"
-        })
-    }
-    else {
-        res.json({
-            status: true,
-            message: 'update successfully'
-        })
-    }
+        if (user1.modifiedCount == 0) {
+            res.json({
+                status: false,
+                message: "not updated"
+            })
+        }
+        else {
+            res.json({
+                status: true,
+                message: 'update successfully'
+            })
+        }
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
-    
+
 };
 
 async function sendEmail(email, subject, text) {
@@ -312,10 +315,10 @@ async function sendEmail(email, subject, text) {
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
-    
+
 
 }
 
@@ -323,11 +326,18 @@ async function forgetPass(req, res) {
     try {
         const schema = joi.object({ email: joi.string().email().required() });
         const { error } = schema.validate(req.body);
-        if (error) return res.status(400).send(error.details[0].message);
+        if (error) return res.status(400).json({
+            message: error.details[0].message,
+            status: false
+
+        });
 
         const user = await UserModel.findOne({ email: req.body.email });
         if (!user)
-            return res.status(400).send("user with given email doesn't exist");
+            return res.status(400).json({
+                message: "user with given email doesn't exist",
+                status : false
+            });
 
         let token = await tokenModel.findOne({ userId: user._id });
         if (!token) {
@@ -376,7 +386,7 @@ async function resetPass(req, res) {
         const token = await tokenModel.findOne({
             userId: user._id,
             token: req.params.token,
-        }); 
+        });
         console.log(token, 'token');
         if (!token) return res.json({
             message: "invalid link or expired",
@@ -404,16 +414,16 @@ async function resetPass(req, res) {
 
 async function employeeDataById(req, res) {
     try {
-        
-    var user = await UserModel.findOne({ _id: req.params.id });
-    res.json({
-        data: user,
-        status: true
-    })
+
+        var user = await UserModel.findOne({ _id: req.params.id });
+        res.json({
+            data: user,
+            status: true
+        })
     } catch (error) {
         res.status(500).json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 }
