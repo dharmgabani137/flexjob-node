@@ -5,6 +5,7 @@ const moment = require('moment');
 const UserModel = require('../models/userModels');
 const { default: mongoose } = require('mongoose');
 const e = require('express');
+const {sendNotification} = require('./notificationController')
 
 async function post(req, res) {
     try {
@@ -209,6 +210,7 @@ async function likePost(req, res) {
             const index = findUser.likeBy.indexOf(loginUser._id);
             findUser.likeBy.splice(index, 1);
             findUser.save();
+            sendNotification(req.payload._id,"dislike","unlike");
             res.json({
                 status: true,
                 like: false,
@@ -218,6 +220,7 @@ async function likePost(req, res) {
         else {
             findUser.likeBy.push(loginUser._id);
             findUser.save();
+            sendNotification(req.payload._id,"like","like");
             res.json({
                 status: true,
                 like: true,
@@ -248,6 +251,7 @@ async function savePost(req, res) {
             const index = user.savedJob.indexOf(loginUser._id);
             user.savedJob.splice(index, 1);
             user.save();
+            sendNotification(req.payload._id,"unsaved","removed");
             res.json({
                 status: true,
                 save: false,
@@ -257,6 +261,7 @@ async function savePost(req, res) {
         else {
             user.savedJob.push(data.postId);
             user.save();
+            sendNotification(req.payload._id,"save","saved");
             res.json({
                 status: true,
                 save: true,
