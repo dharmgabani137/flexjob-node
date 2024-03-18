@@ -1,31 +1,32 @@
 const PostModel = require('../models/postModels');
 const ProposalModel = require('../models/proposalModels');
 const joi = require('joi');
+const {sendNotification} = require('./notificationController')
 
 async function proposal(req, res) {
     try {
         var data = req.body;
-    const schema = joi.object().keys({
-        postId: joi.string().required(),
-        description: joi.string().required(),
-        bidAmount: joi.number().required(),
-        status: joi.string().required()
-    })
-    var valid = schema.validate(data);
+        const schema = joi.object().keys({
+            postId: joi.string().required(),
+            description: joi.string().required(),
+            bidAmount: joi.number().required(),
+            status: joi.string().required()
+        })
+        var valid = schema.validate(data);
 
-    var user = await ProposalModel.create({ postId: data.postId, userId: req.payload._id, description: data.description, bidAmount: data.bidAmount, status: data.status });
-    console.log(user);
-    res.json({
-        status: true,
-        message: "created successfully"
-    })
+        var user = await ProposalModel.create({ postId: data.postId, userId: req.payload._id, description: data.description, bidAmount: data.bidAmount, status: data.status });
+        sendNotification(req.payload._id,"proposal","new proposal");
+        res.json({
+            status: true,
+            message: "created successfully"
+        })
     } catch (error) {
         res.status(500).json({
             status: false,
             error: error.message
         });
     }
-    
+
 }
 async function proposalUpdate(req, res) {
     try {
@@ -42,11 +43,11 @@ async function proposalUpdate(req, res) {
         if (valid?.error) {
             console.log(valid.error.message);
             return res.json({
-                status : false,
+                status: false,
                 error: valid.error.message
             })
         }
-    
+
         var user = await ProposalModel.updateOne({}, { postId: data.postId, userId: data.userId, description: data.description, bidAmount: data.bidAmount, status: data.status });
         if (user.modifiedCount == 0) {
             res.json({
@@ -60,14 +61,14 @@ async function proposalUpdate(req, res) {
                 message: "updated successfully"
             })
         }
-    
+
     } catch (error) {
         res.status(500).json({
             status: false,
             error: error.message
         });
     }
-   
+
 
 }
 
@@ -91,7 +92,7 @@ async function proposalAcceptReject(req, res) {
     try {
         var data = req.body;
         var user = await ProposalModel.updateOne({ _id: data.id }, { status: data.status });
-    
+
         if (user.modifiedCount == 0) {
             res.json({
                 status: true,
@@ -110,7 +111,7 @@ async function proposalAcceptReject(req, res) {
             error: error.message
         });
     }
-   
+
 }
 
 

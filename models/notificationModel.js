@@ -6,9 +6,8 @@ const notificationSchema = new mongoose.Schema({
         require: true,
         ref: "user"
     },
-   
     data : {
-        type : String,
+        type : Object,
         require : true
     },
     isRead : {

@@ -10,7 +10,7 @@ const { employeeData } = require('./controller/employeeController');
 const { employerData } = require('./controller/employerController');
 const { seedData, expertiseData } = require('./controller/expertiseController');
 const { reviews, reviewList } = require('./controller/reviewsController');
-const { sendNotification } = require('./controller/notificationController');
+// const { sendNotification } = require('./controller/notificationController');
 const { dashbord, loginPost, loginGet, table, adminData, createData, insertData, updateView, updateData, userDelete, userBlock, adminLogout } = require('./controller/homeController');
 
 const route = express.Router();
@@ -91,13 +91,15 @@ route.get('/proposal-by-user', proposalByUser);
 route.post('/like', verify, likePost);
 route.post('/save-post', verify, savePost);
 route.post('/reviews', verify, reviews);
-route.get('/sendNotification', sendNotification);
+// route.get('/sendNotification', sendNotification);
 route.get('/user-by-id/:id', employeeDataById);
 route.get('/review-list', verify, reviewList);
 route.get('/save-job-list',verify,saveJobList)
 route.get('/current-user-post',verify,currentUserPost);
 route.get('/post-list-by-user-id/:id',verify ,postListByUserId);
-route.post('/payment',)
+route.get('/payment', (req,res)=>{
+    res.render('payment')
+})
 
 
 
