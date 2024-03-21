@@ -60,7 +60,10 @@ async function verify(req, res, next) {
 
         next();
     } catch (error) {
-        res.status(401).json({ message: "Unauthorized: Invalid or expired token" });
+        res.json({
+            status: false,
+            message: "Unauthorized: Invalid or expired token"
+        });
     }
 }
 
