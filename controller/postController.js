@@ -315,7 +315,6 @@ async function postDataById(req, res) {
             formattedTime: moment(v.createdAt).fromNow(),
             expertise: await expertiseModel.find({
                 _id: { $in: v.expertise }
-
             }),
             liked: v.likeBy.includes(req.payload._id)
         })))
