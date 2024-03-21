@@ -22,7 +22,7 @@ async function employerData(req, res) {
     });
 
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });

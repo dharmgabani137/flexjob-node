@@ -32,7 +32,7 @@ async function post(req, res) {
             message: "created successfully"
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -75,7 +75,7 @@ async function postUpdate(req, res) {
             })
         }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -103,7 +103,7 @@ async function postDelete(req, res) {
             })
         }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -183,7 +183,7 @@ async function postList(req, res) {
         })
 
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -228,7 +228,7 @@ async function likePost(req, res) {
             })
         }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -272,7 +272,7 @@ async function savePost(req, res) {
 
 
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -329,7 +329,7 @@ async function postDataById(req, res) {
             status: true,
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -375,7 +375,7 @@ async function saveJobList(req, res) {
             status: true
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -393,7 +393,7 @@ async function currentUserPost(req, res) {
             currentUserPost: postList
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -429,7 +429,7 @@ async function postListByUserId(req, res) {
             data: newD
         });
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: "An error occurred while fetching post list",
             message: error.message

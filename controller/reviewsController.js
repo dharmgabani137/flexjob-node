@@ -28,7 +28,7 @@ async function reviews(req,
 
     }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -56,7 +56,7 @@ async function reviewList(req,res) {
             status : true
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });

@@ -13,6 +13,7 @@ const { reviews, reviewList } = require('./controller/reviewsController');
 const { notificationList } = require('./controller/notificationController');
 const { dashbord, loginPost, loginGet, table, adminData, createData, insertData, updateView, updateData, userDelete, userBlock, adminLogout } = require('./controller/homeController');
 const { seed } = require('./seed/seed');
+const { createOrder, verifyOrder } = require('./controller/paymentController');
 
 const route = express.Router();
 
@@ -101,6 +102,9 @@ route.get('/post-list-by-user-id/:id', verify, postListByUserId);
 route.get('/payment', (req, res) => {
     res.render('payment')
 });
+route.post('/create-order', verify,createOrder);
+route.post('/verify-order',verifyOrder)
+
 
 
 route.get('/seed', seed);
@@ -119,6 +123,8 @@ route.post('/update-data', adminVerify, updateData);
 route.get('/user-delete', adminVerify, userDelete);
 route.get('/user-block', adminVerify, userBlock);
 route.post('/admin-logout', adminLogout);
+
+
 
 
 

@@ -1,5 +1,4 @@
 const notificationModel = require('../models/notificationModel');
-
 async function sendNotification(userId,type,message){
     var notification = await notificationModel.create({
         userId: userId,

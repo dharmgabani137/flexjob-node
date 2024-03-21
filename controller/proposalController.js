@@ -22,7 +22,7 @@ async function proposal(req, res) {
             message: "created successfully"
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -64,7 +64,7 @@ async function proposalUpdate(req, res) {
         }
 
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -95,7 +95,7 @@ async function proposalByPost(req, res) {
             status: true
         });
     } catch (e) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: e
         });
@@ -120,7 +120,7 @@ async function proposalAcceptReject(req, res) {
             })
         }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -133,16 +133,26 @@ async function proposalByUser(req, res) {
     var data = req.query;
     try {
         // Adding Pagination 
-        const limitValue = req.query.limit || 3;
-        const skipValue = req.query.skip || 0;
-        const posts = await ProposalModel.find({ userId: data.userId })
-            .limit(limitValue).skip(skipValue);
-        res.status(200).json({
+        // const limitValue = req.query.limit || 3;
+        // const skipValue = req.query.skip || 0;
+        const posts = await ProposalModel.aggregate([
+            {$match : {userId : new mongoose.Types.ObjectId(data.userId)}},
+            {
+                $lookup : { 
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            }
+        ])
+            // .limit(limitValue).skip(skipValue);
+        res.json({
             data : posts,
             status : true
         });
     } catch (e) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: e
         });

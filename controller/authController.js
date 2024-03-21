@@ -87,7 +87,7 @@ async function registerPost(req, res) {
         }
 
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -111,7 +111,7 @@ async function login(req, res) {
         }
         const passwordMatch = await bcrypt.compare(data.password, user.password);
         if (user.userBlock) {
-            return res.status(500).json({
+            return res.json({
                 status: false,
                 message: 'you are blocked'
             });
@@ -148,7 +148,7 @@ async function login(req, res) {
             });
         }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -173,7 +173,7 @@ async function logout(req, res) {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({
+        res.json({
             status: false,
             message: 'Internal server error'
         });
@@ -197,7 +197,7 @@ async function profile(req, res) {
             status: true,
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -247,7 +247,7 @@ async function update(req, res) {
 
                 // Use the mv() method to place the file somewhere on your server'
                 uploadedFile.mv('./public' + img, function (err) {
-                    if (err) return res.status(500).json({
+                    if (err) return res.json({
                         message: err,
                         status: false
                     });
@@ -287,7 +287,7 @@ async function update(req, res) {
             })
         }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -313,7 +313,7 @@ async function sendEmail(email, subject, text) {
             text: text,
         });
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
@@ -421,7 +421,7 @@ async function employeeDataById(req, res) {
             status: true
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: error.message
         });
