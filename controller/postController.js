@@ -5,6 +5,7 @@ const moment = require('moment');
 const UserModel = require('../models/userModels');
 const { default: mongoose } = require('mongoose');
 const e = require('express');
+const {sendNotification} = require('./notificationController')
 
 async function post(req, res) {
     try {
@@ -21,7 +22,7 @@ async function post(req, res) {
         if (valid?.error) {
             return res.json({
                 status: false,
-                error: valid.error.message
+                message: valid.error.message
             })
         }
         console.log(req.payload);
@@ -31,9 +32,9 @@ async function post(req, res) {
             message: "created successfully"
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -57,7 +58,7 @@ async function postUpdate(req, res) {
         if (valid?.error) {
             return res.json({
                 status: false,
-                error: valid.error.message
+                message: valid.error.message
             })
         }
         var user = await PostModel.updateOne({ _id: data.id }, { userId: data.userId, budget: data.budget, status: data.status });
@@ -74,9 +75,9 @@ async function postUpdate(req, res) {
             })
         }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -102,9 +103,9 @@ async function postDelete(req, res) {
             })
         }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -182,9 +183,9 @@ async function postList(req, res) {
         })
 
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -209,6 +210,7 @@ async function likePost(req, res) {
             const index = findUser.likeBy.indexOf(loginUser._id);
             findUser.likeBy.splice(index, 1);
             findUser.save();
+            sendNotification(req.payload._id,"dislike","unlike");
             res.json({
                 status: true,
                 like: false,
@@ -218,6 +220,7 @@ async function likePost(req, res) {
         else {
             findUser.likeBy.push(loginUser._id);
             findUser.save();
+            sendNotification(req.payload._id,"like","like");
             res.json({
                 status: true,
                 like: true,
@@ -225,9 +228,9 @@ async function likePost(req, res) {
             })
         }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -248,6 +251,7 @@ async function savePost(req, res) {
             const index = user.savedJob.indexOf(loginUser._id);
             user.savedJob.splice(index, 1);
             user.save();
+            sendNotification(req.payload._id,"unsaved","removed");
             res.json({
                 status: true,
                 save: false,
@@ -257,6 +261,7 @@ async function savePost(req, res) {
         else {
             user.savedJob.push(data.postId);
             user.save();
+            sendNotification(req.payload._id,"save","saved");
             res.json({
                 status: true,
                 save: true,
@@ -267,9 +272,9 @@ async function savePost(req, res) {
 
 
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -305,7 +310,7 @@ async function postDataById(req, res) {
             _id: { $in: post[0]?.expertise }
         })
 
-        var newD = await Promise.all(user.map(async (v) => ({
+        var newD = await Promise.all(post.map(async (v) => ({
             ...v, //spread
             formattedTime: moment(v.createdAt).fromNow(),
             expertise: await expertiseModel.find({
@@ -324,9 +329,9 @@ async function postDataById(req, res) {
             status: true,
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -370,9 +375,9 @@ async function saveJobList(req, res) {
             status: true
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -388,9 +393,9 @@ async function currentUserPost(req, res) {
             currentUserPost: postList
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -424,10 +429,10 @@ async function postListByUserId(req, res) {
             data: newD
         });
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: "An error occurred while fetching post list",
-            error: error.message
+            message: error.message
         });
     }
 }

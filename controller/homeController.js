@@ -23,9 +23,9 @@ async function adminData(req, res) {
         })
 
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -40,9 +40,9 @@ async function dashbord(req, res) {
     
         res.render('dashbord', { userTotal, postTotal });
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
    
@@ -71,9 +71,9 @@ async function loginPost(req, res) {
         res.redirect("/dashbord");
     }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
     
@@ -133,9 +133,9 @@ async function insertData(req, res) {
     }
 
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
     
@@ -167,9 +167,9 @@ async function updateData(req, res) {
     })
     res.redirect('/table')
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
     

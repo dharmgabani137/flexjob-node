@@ -10,9 +10,10 @@ const { employeeData } = require('./controller/employeeController');
 const { employerData } = require('./controller/employerController');
 const { seedData, expertiseData } = require('./controller/expertiseController');
 const { reviews, reviewList } = require('./controller/reviewsController');
-// const { sendNotification } = require('./controller/notificationController');
+const { notificationList } = require('./controller/notificationController');
 const { dashbord, loginPost, loginGet, table, adminData, createData, insertData, updateView, updateData, userDelete, userBlock, adminLogout } = require('./controller/homeController');
 const { seed } = require('./seed/seed');
+const { createOrder, verifyOrder } = require('./controller/paymentController');
 
 const route = express.Router();
 
@@ -95,7 +96,7 @@ route.get('/proposal-by-user', proposalByUser);
 route.post('/like', verify, likePost);
 route.post('/save-post', verify, savePost);
 route.post('/reviews', verify, reviews);
-// route.get('/sendNotification', sendNotification);
+route.get('/notification-list', notificationList);
 route.get('/user-by-id/:id', employeeDataById);
 route.get('/review-list', verify, reviewList);
 route.get('/save-job-list', verify, saveJobList)
@@ -103,7 +104,9 @@ route.get('/current-user-post', verify, currentUserPost);
 route.get('/post-list-by-user-id/:id', verify, postListByUserId);
 route.get('/payment', (req, res) => {
     res.render('payment')
-})
+});
+route.post('/create-order', verify,createOrder);
+route.post('/verify-order',verifyOrder)
 
 
 
@@ -123,6 +126,8 @@ route.post('/update-data', adminVerify, updateData);
 route.get('/user-delete', adminVerify, userDelete);
 route.get('/user-block', adminVerify, userBlock);
 route.post('/admin-logout', adminLogout);
+
+
 
 
 

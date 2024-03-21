@@ -49,7 +49,7 @@ async function registerPost(req, res) {
         if (valid?.error) {
             console.log(valid.error.message);
             return res.json({
-                error: valid.error.message,
+                message: valid.error.message,
                 status: false
             })
         }
@@ -87,9 +87,9 @@ async function registerPost(req, res) {
         }
 
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -111,7 +111,7 @@ async function login(req, res) {
         }
         const passwordMatch = await bcrypt.compare(data.password, user.password);
         if (user.userBlock) {
-            return res.status(500).json({
+            return res.json({
                 status: false,
                 message: 'you are blocked'
             });
@@ -148,9 +148,9 @@ async function login(req, res) {
             });
         }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -173,7 +173,7 @@ async function logout(req, res) {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({
+        res.json({
             status: false,
             message: 'Internal server error'
         });
@@ -197,9 +197,9 @@ async function profile(req, res) {
             status: true,
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -229,7 +229,7 @@ async function update(req, res) {
         var valid = schema.validate(data);
         if (valid?.error) {
             return res.json({
-                error: valid.error.message,
+                message: valid.error.message,
                 status: false
             })
         }
@@ -248,7 +248,10 @@ async function update(req, res) {
 
                 // Use the mv() method to place the file somewhere on your server'
                 uploadedFile.mv('./public' + img, function (err) {
-                    if (err) return res.status(500).send(err);
+                    if (err) return res.json({
+                        message: err,
+                        status: false
+                    });
                     // File uploaded successfully
                 });
                 data.img = img
@@ -287,7 +290,7 @@ async function update(req, res) {
     } catch (error) {
         res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -311,9 +314,9 @@ async function sendEmail(email, subject, text) {
             text: text,
         });
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -324,11 +327,18 @@ async function forgetPass(req, res) {
     try {
         const schema = joi.object({ email: joi.string().email().required() });
         const { error } = schema.validate(req.body);
-        if (error) return res.status(400).send(error.details[0].message);
+        if (error) return res.status(400).json({
+            message: error.details[0].message,
+            status: false
+
+        });
 
         const user = await UserModel.findOne({ email: req.body.email });
         if (!user)
-            return res.status(400).send("user with given email doesn't exist");
+            return res.status(400).json({
+                message: "user with given email doesn't exist",
+                status : false
+            });
 
         let token = await tokenModel.findOne({ userId: user._id });
         if (!token) {
@@ -412,9 +422,9 @@ async function employeeDataById(req, res) {
             status: true
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 }

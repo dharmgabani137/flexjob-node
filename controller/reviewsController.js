@@ -2,7 +2,8 @@ const { default: mongoose } = require('mongoose');
 const reviewsModel = require('../models/reviewsModel');
 const joi = require('joi');
 
-async function reviews(req, res) {
+async function reviews(req, 
+    ) {
     try {
         var data = req.body;
     const schema = joi.object().keys({
@@ -15,7 +16,7 @@ async function reviews(req, res) {
     if (valid?.error) {
         return res.json({
             status : false,
-            error: valid.error.message
+            message: valid.error.message
         })
     }else{
         var user = await reviewsModel.create({ userId: data.userId, reviewer: req.payload._id, feedBack: data.feedBack, star: data.star });
@@ -27,9 +28,9 @@ async function reviews(req, res) {
 
     }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
     
@@ -55,9 +56,9 @@ async function reviewList(req,res) {
             status : true
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
    

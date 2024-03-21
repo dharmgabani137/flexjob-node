@@ -1,7 +1,8 @@
 const PostModel = require('../models/postModels');
 const ProposalModel = require('../models/proposalModels');
 const joi = require('joi');
-const {sendNotification} = require('./notificationController')
+const { sendNotification } = require('./notificationController');
+const { default: mongoose } = require('mongoose');
 
 async function proposal(req, res) {
     try {
@@ -15,15 +16,15 @@ async function proposal(req, res) {
         var valid = schema.validate(data);
 
         var user = await ProposalModel.create({ postId: data.postId, userId: req.payload._id, description: data.description, bidAmount: data.bidAmount, status: data.status });
-        sendNotification(req.payload._id,"proposal","new proposal");
+        sendNotification(req.payload._id, "proposal", "new proposal");
         res.json({
             status: true,
             message: "created successfully"
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -44,7 +45,7 @@ async function proposalUpdate(req, res) {
             console.log(valid.error.message);
             return res.json({
                 status: false,
-                error: valid.error.message
+                message: valid.error.message
             })
         }
 
@@ -63,9 +64,9 @@ async function proposalUpdate(req, res) {
         }
 
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -78,13 +79,26 @@ async function proposalByPost(req, res) {
     try {
 
         // Adding Pagination 
-        const limitValue = req.query.limit || 3;
-        const skipValue = req.query.skip || 0;
-        const posts = await ProposalModel.find({ postId: data.postId })
-            .limit(limitValue).skip(skipValue);
-        res.status(200).send(posts);
+        const posts = await ProposalModel.aggregate([
+            { $match: { postId: new mongoose.Types.ObjectId(data.postId) } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            }
+        ])
+        res.json({
+            data: posts,
+            status: true
+        });
     } catch (e) {
-        console.log(e);
+        res.json({
+            status: false,
+            message: e
+        });
     }
 }
 
@@ -106,9 +120,9 @@ async function proposalAcceptReject(req, res) {
             })
         }
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
 
@@ -119,13 +133,29 @@ async function proposalByUser(req, res) {
     var data = req.query;
     try {
         // Adding Pagination 
-        const limitValue = req.query.limit || 3;
-        const skipValue = req.query.skip || 0;
-        const posts = await ProposalModel.find({ userId: data.userId })
-            .limit(limitValue).skip(skipValue);
-        res.status(200).send(posts);
+        // const limitValue = req.query.limit || 3;
+        // const skipValue = req.query.skip || 0;
+        const posts = await ProposalModel.aggregate([
+            {$match : {userId : new mongoose.Types.ObjectId(data.userId)}},
+            {
+                $lookup : { 
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            }
+        ])
+            // .limit(limitValue).skip(skipValue);
+        res.json({
+            data : posts,
+            status : true
+        });
     } catch (e) {
-        console.log(e);
+        res.json({
+            status: false,
+            message: e
+        });
     }
 }
 

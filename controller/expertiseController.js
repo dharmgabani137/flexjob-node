@@ -15,9 +15,9 @@ async function seedData(req, res) {
             message : "data inserted"
         })
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
-            error: error.message
+            message: error.message
         });
     }
      

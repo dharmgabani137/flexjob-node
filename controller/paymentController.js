@@ -1,0 +1,80 @@
+const paymentModel = require('../models/paymentModel');
+const ProposalModel = require('../models/proposalModels');
+const Razorpay = require("razorpay")
+
+const razorpayInstance = new Razorpay({
+
+    // Replace with your key_id 
+    key_id: "rzp_test_GFjWtFrV9orbTZ",
+
+    // Replace with your key_secret 
+    key_secret: "o46HMxP3jIjxadoddMDLsLgA"
+});
+
+async function createOrder(req, res) {
+    // STEP 1: 
+    const { payerId, receiverId, postId ,proposalId, amount, status, message, rzp_txz } = req.body;
+    var proposalData = await ProposalModel.findOne({_id : req.body.proposalId});
+    // STEP 2:	 
+    razorpayInstance.orders.create({ payerId, receiverId, postId ,amount :  proposalData.bidAmount, status, message, rzp_txz },
+        async (err, order) => {
+            
+
+
+            
+            //STEP 3 & 4: 
+            if (!err){
+                
+                var paymentDetails = await paymentModel.create({
+                    payerId : req.payload._id,
+                    receiverId : req.body.proposalId,
+                    postId : proposalData.postId,
+                    proposalId : req.body.proposalId,
+                    amount : proposalData.bidAmount,
+
+            })
+                res.json(order)
+            }else{
+                res.send(err);
+            }
+                
+            
+                
+        }
+    )
+}
+
+async function verifyOrder(req, res) {
+    // STEP 7: Receive Payment Data 
+    const { order_id, payment_id, } = req.body;
+    const razorpay_signature = req.headers['x-razorpay-signature'];
+
+    // Pass yours key_secret here 
+    const key_secret = "YAEUthsup8SijNs3iveeVlL1";
+
+    // STEP 8: Verification & Send Response to User 
+
+    // Creating hmac object 
+    let hmac = crypto.createHmac('sha256', key_secret);
+
+    // Passing the data to be hashed 
+    hmac.update(order_id + "|" + payment_id);
+
+    // Creating the hmac in the required format 
+    const generated_signature = hmac.digest('hex');
+
+
+    if (razorpay_signature === generated_signature) {
+        var updateStatus = await paymentModel.updateOne({ _id: payment_id}, {
+            status: success
+        });
+        res.json({ success: true, message: "Payment has been verified"})
+    }
+    else
+        res.json({ success: false, message: "Payment verification failed" })
+}
+
+module.exports = {
+    createOrder,
+    verifyOrder
+}
