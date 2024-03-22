@@ -2,8 +2,7 @@ const { default: mongoose } = require('mongoose');
 const reviewsModel = require('../models/reviewsModel');
 const joi = require('joi');
 
-async function reviews(req, 
-    ) {
+async function reviews(req, res) {
     try {
         var data = req.body;
     const schema = joi.object().keys({
