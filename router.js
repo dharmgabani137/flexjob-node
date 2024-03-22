@@ -105,8 +105,8 @@ route.get('/post-list-by-user-id/:id', verify, postListByUserId);
 route.get('/payment', (req, res) => {
     res.render('payment')
 });
-route.post('/create-order', verify,createOrder);
-route.post('/verify-order',verifyOrder)
+route.post('/create-order', verify, createOrder);
+route.post('/verify-order', verifyOrder)
 
 
 

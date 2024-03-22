@@ -27,6 +27,10 @@ const paymentSchema = new mongoose.Schema({
         default : "pending",
         require : true
     },
+    order_id : {
+        type : String,
+        default : null
+    },
     rzp_txz : {
         type : String,
         default : null
