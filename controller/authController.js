@@ -9,6 +9,7 @@ const nodemailer = require("nodemailer");
 const crypto = require('crypto');
 var fs = require('fs');
 const { start } = require("repl");
+const expertiseModel = require("../models/expertiseModel");
 
 
 
@@ -221,6 +222,7 @@ async function update(req, res) {
             title: joi.string(),
             description: joi.string(),
             // workHistory: joi.array(),
+            image: joi.allow(),
             location: joi.string(),
             // savedJob: joi.array(),
             rate: joi.string()
@@ -416,6 +418,22 @@ async function employeeDataById(req, res) {
     try {
 
         var user = await UserModel.findOne({ _id: req.params.id });
+
+        // var newD = await Promise.all(post.map(async (v) => ({
+        //     ...v, //spread
+        //     formattedTime: moment(v.createdAt).fromNow(),
+        //     expertise: await expertiseModel.find({
+        //         _id: { $in: v.expertise }
+
+        //     }),
+        //     liked: v.likeBy.includes(req.payload._id)
+        // })))
+
+        user.expertise = await expertiseModel.find({
+            _id: { $in: user.expertise }
+
+        })
+
         res.json({
             data: user,
             status: true

@@ -10,8 +10,8 @@ async function employeeData(req, res) {
         // Calculate the start and end indexes for the requested page
         var skip = (page - 1) * limit;
 
-        var user = await UserModel.find({ type: 'employee' }).skip(skip).limit(limit)
-        var count = await UserModel.countDocuments({ type: 'employee' })
+        var user = await UserModel.find({ type: 'candidate' }).skip(skip).limit(limit)
+        var count = await UserModel.countDocuments({ type: 'candidate' })
 
         var totalPages = Math.ceil(count / limit)
 
