@@ -8,19 +8,25 @@
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <a href="/create-data">create</a>
+            <a href="/create-data"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;">
+                    <path
+                        d="M3 16c0 1.103.897 2 2 2h3.586L12 21.414 15.414 18H19c1.103 0 2-.897 2-2V4c0-1.103-.897-2-2-2H5c-1.103 0-2 .897-2 2v12zM5 4h14v12h-4.414L12 18.586 9.414 16H5V4z">
+                    </path>
+                    <path d="M11 14h2v-3h3V9h-3V6h-2v3H8v2h3z"></path>
+                </svg></a>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>firstName</th>
+                            <th>Name</th>
                             <th>lastName</th>
                             <th>email</th>
                             <th>password</th>
                             <th>mobile</th>
-                            <th>expertise</th>
+                            <th>technology</th>
                             <th>title</th>
                             <th>description</th>
                             <th>workHistory</th>
@@ -28,7 +34,7 @@
                             <th>savedJob</th>
                             <th>rate</th>
                             <th>img</th>
-                            <th>update</th>     
+                            <th>update</th>
                             <th>block</th>
                         </tr>
                     </thead>
@@ -49,7 +55,7 @@
                             <th>img</th>
                             <th>update</th>
                             <th>block</th>
-                        
+
 
                         </tr>
                     </tfoot>
@@ -96,15 +102,35 @@
                                     <%= element.img %>
                                 </td>
                                 <td>
-                                   
-                                    <a class="btn btn-primary" href="/update-view?id=<%= element._id %>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M8.707 19.707 18 10.414 13.586 6l-9.293 9.293a1.003 1.003 0 0 0-.263.464L3 21l5.242-1.03c.176-.044.337-.135.465-.263zM21 7.414a2 2 0 0 0 0-2.828L19.414 3a2 2 0 0 0-2.828 0L15 4.586 19.414 9 21 7.414z"></path></svg></a>
+
+                                    <a class="btn btn-primary" href="/update-view?id=<%= element._id %>"><svg
+                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;">
+                                            <path
+                                                d="M8.707 19.707 18 10.414 13.586 6l-9.293 9.293a1.003 1.003 0 0 0-.263.464L3 21l5.242-1.03c.176-.044.337-.135.465-.263zM21 7.414a2 2 0 0 0 0-2.828L19.414 3a2 2 0 0 0-2.828 0L15 4.586 19.414 9 21 7.414z">
+                                            </path>
+                                        </svg></a>
                                 </td>
                                 <td>
                                     <!-- <a href="./user-block?id=<%= element._id %>">block</a> -->
-                                    <a class="btn btn-primary" href="/user-block?id=<%= element._id %>&userBlock=<%= element.userBlock %>">
+                                    <a class="btn btn-primary"
+                                        href="/user-block?id=<%= element._id %>&userBlock=<%= element.userBlock %>">
                                         <% if (element.userBlock) { %>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M17 8V7c0-2.757-2.243-5-5-5S7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2H9V7c0-1.654 1.346-3 3-3s3 1.346 3 3v1h2z"></path></svg>
-                                            <% } else { %><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M20 12c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5S7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8zM9 7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7z"></path></svg><%}%>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24"
+                                                style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;">
+                                                <path
+                                                    d="M20 12c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5S7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8zM9 7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7z">
+                                                </path>
+                                            </svg>
+                                            <% } else { %> <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                    height="24" viewBox="0 0 24 24"
+                                                    style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;">
+                                                    <path
+                                                        d="M17 8V7c0-2.757-2.243-5-5-5S7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2H9V7c0-1.654 1.346-3 3-3s3 1.346 3 3v1h2z">
+                                                    </path>
+                                                </svg>
+                                                <%}%>
                                     </a>
 
                                 </td>

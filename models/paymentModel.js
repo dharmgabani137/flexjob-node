@@ -7,15 +7,16 @@ const paymentSchema = new mongoose.Schema({
         ref: "user"
     },
     receiverId : {
-        type : Object,
+        type :  mongoose.Schema.Types.ObjectId,
         require : true
     },
     postId : {
-        type : String,
-        require : true
+        type :  mongoose.Schema.Types.ObjectId,
+        require : true,
+        ref : "post"
     },
     proposalId : {
-        type : String,
+        type :  mongoose.Schema.Types.ObjectId,
         require : true
     },
     amount : {

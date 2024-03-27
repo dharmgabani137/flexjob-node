@@ -6,6 +6,8 @@ const nodemailer = require("nodemailer");
 const crypto = require('crypto');
 const PostModel = require("../models/postModels");
 var session = require('express-session');
+const expertiseModel = require("../models/expertiseModel");
+const paymentModel = require("../models/paymentModel");
 var MongoDBStore = require('connect-mongodb-session')(session);
 
 
@@ -37,7 +39,7 @@ async function dashbord(req, res) {
         var postCount = await PostModel.find({});
         userTotal = userCount.length;
         postTotal = postCount.length;
-    
+
         res.render('dashbord', { userTotal, postTotal });
     } catch (error) {
         res.json({
@@ -45,7 +47,7 @@ async function dashbord(req, res) {
             message: error.message
         });
     }
-   
+
 }
 
 function loginGet(req, res) {
@@ -54,34 +56,47 @@ function loginGet(req, res) {
 async function loginPost(req, res) {
     try {
         let data = req.body;
-    var user = await adminModel.findOne({
-        email: data.email,
-        password: data.password,
-        type: "admin"
-    });
-    console.log(user, "userlist....................");
-    // req.session.user = user;
-    // console.log(req.session.user, "user session ..........................");
+        var user = await adminModel.findOne({
+            email: data.email,
+            password: data.password,
+            type: "admin"
+        });
+        console.log(user, "userlist....................");
+        // req.session.user = user;
+        // console.log(req.session.user, "user session ..........................");
 
-    if (user == null) {
-        res.redirect("/login-admin");
+        if (user == null) {
+            res.redirect("/login-admin");
 
-    } else {
-        req.session.user = user
-        res.redirect("/dashbord");
-    }
+        } else {
+            req.session.user = user
+            res.redirect("/dashbord");
+        }
     } catch (error) {
         res.json({
             status: false,
             message: error.message
         });
     }
-    
+
 }
 
 async function table(req, res) {
     var user = await UserModel.find({});
     res.render('table', { user })
+}
+async function jobs(req, res) {
+    var user = await PostModel.find({});
+    var newD = await Promise.all(user.map(async (v) => ({
+        ...v._doc, //spread
+        // formattedTime: moment(v.createdAt).fromNow(),
+        expertise: await expertiseModel.find({
+            _id: { $in: v.expertise }
+
+        })
+    })))
+    console.log(newD);
+    res.render('jobs', { newD })
 }
 async function createData(req, res) {
     res.render('createData')
@@ -89,21 +104,68 @@ async function createData(req, res) {
 async function insertData(req, res) {
     try {
         var data = req.body;
-    console.log(data);
-    // Check if the 'password' field is present in the request data
-    if (!data.password) {
-        return res.json({
+        console.log(data);
+        // Check if the 'password' field is present in the request data
+        if (!data.password) {
+            return res.json({
+                status: false,
+                message: 'Password is required'
+            });
+        }
+
+
+
+        const hashedPassword = await bcrypt.hash(data.password, 10);
+        var checkEmail = await UserModel.findOne({ email: data.email });
+        if (checkEmail == null) {
+            var user = await UserModel.create({
+                type: data.type,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                password: hashedPassword,
+                mobile: data.mobile,
+                //       //  // language: data.language,
+                title: data.title,
+                description: data.description,
+                // workHistory: data.workHistory,
+                location: data.location,
+                // savedJob: data.savedJob,
+                rate: data.rate,
+                // img : '/img/C:\Users\Janvi\Pictures\Screenshots'
+            })
+            console.log(user);
+            res.json({
+                status: true,
+                message: 'register successfully'
+            });
+        }
+        else {
+            res.json({
+                status: false,
+                message: 'user already exists'
+            })
+        }
+
+    } catch (error) {
+        res.json({
             status: false,
-            message: 'Password is required'
+            message: error.message
         });
     }
 
+}
 
+async function updateView(req, res) {
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-    var checkEmail = await UserModel.findOne({ email: data.email });
-    if (checkEmail == null) {
-        var user = await UserModel.create({
+    var user = await UserModel.findOne({ _id: req.query.id });
+    res.render('updateview', { user })
+}
+async function updateData(req, res) {
+    try {
+        var data = req.body;
+        const hashedPassword = await bcrypt.hash(data.password, 10);
+        var user = await UserModel.updateOne({ _id: data.id }, {
             type: data.type,
             firstName: data.firstName,
             lastName: data.lastName,
@@ -117,67 +179,15 @@ async function insertData(req, res) {
             location: data.location,
             // savedJob: data.savedJob,
             rate: data.rate,
-            // img : '/img/C:\Users\Janvi\Pictures\Screenshots'
         })
-        console.log(user);
-        res.json({
-            status: true,
-            message: 'register successfully'
-        });
-    }
-    else {
-        res.json({
-            status: false,
-            message: 'user already exists'
-        })
-    }
-
+        res.redirect('/table')
     } catch (error) {
         res.json({
             status: false,
             message: error.message
         });
     }
-    
-}
 
-async function updateView(req, res) {
-
-    var user = await UserModel.findOne({ _id: req.query.id });
-    res.render('updateview', { user })
-}
-async function updateData(req, res) {
-    try {
-        var data = req.body;
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-    var user = await UserModel.updateOne({ _id: data.id }, {
-        type: data.type,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        password: hashedPassword,
-        mobile: data.mobile,
-        //       //  // language: data.language,
-        title: data.title,
-        description: data.description,
-        // workHistory: data.workHistory,
-        location: data.location,
-        // savedJob: data.savedJob,
-        rate: data.rate,
-    })
-    res.redirect('/table')
-    } catch (error) {
-        res.json({
-            status: false,
-            message: error.message
-        });
-    }
-    
-}
-async function userDelete(req, res) {
-    var deleteUser = await UserModel.deleteOne({ _id: req.query.id });
-    console.log(deleteUser);
-    res.redirect('/table')
 }
 async function userBlock(req, res) {
     if (req.query.userBlock === 'true') {
@@ -196,6 +206,74 @@ async function adminLogout(req, res) {
     req.session.user = null;
     res.redirect('/login-admin')
 }
+// --------------------------------------------------------------------------------------------------------------------------
+async function postDelete(req, res) {
+    var deleteUser = await PostModel.deleteOne({ _id: req.query.id });
+    console.log(deleteUser);
+    res.redirect('/jobs')
+}
+async function updatePostView(req, res) {
+
+    var user = await PostModel.findOne({ _id: req.query.id });
+    res.render('updatePostView', { user })
+}
+async function updatepost(req, res) {
+    try {
+        var data = req.body;
+        var user = await PostModel.updateOne({ _id: data.id },
+            {
+                description: data.description,
+                title: data.title,
+                expertise: data.expertise,
+                budget: data.expertise,
+                status: data.status
+            });
+        res.redirect('/jobs')
+    } catch (error) {
+        res.json({
+            status: false,
+            message: error.message
+        });
+    }
+
+}
+async function createPost(req, res) {
+    res.render('createPost')
+}
+async function insertPost(req, res) {
+    try {
+
+        var user = await PostModel.create({ userId: req.payload._id, description: data.description, title: data.title, expertise: data.expertise, budget: data.budget });
+        res.json({
+            status: true,
+            message: "created successfully"
+        })
+    } catch (error) {
+        res.json({
+            status: false,
+            message: error.message
+        });
+    }
+
+}
+//---------------------------------------------------------------------------------------------
+async function paymentView(req,res) {
+    const payment = await paymentModel.aggregate([
+        // { $match: { postId: new mongoose.Types.ObjectId(req.query.postId) } },
+        {
+            $lookup: {
+                from: "posts",
+                localField: "postId",
+                foreignField: "_id",
+                as: "post"
+            }
+        }
+    ])
+   
+    res.render('paymentView',{user: payment})
+}
+
+
 
 module.exports = {
     dashbord,
@@ -207,8 +285,15 @@ module.exports = {
     insertData,
     updateView,
     updateData,
-    userDelete,
+    postDelete,
     userBlock,
-    adminLogout
+    adminLogout,
+    jobs,
+    updatepost,
+    updateView,
+    updatePostView,
+    insertPost,
+    createPost,
+    paymentView,
 
 }
