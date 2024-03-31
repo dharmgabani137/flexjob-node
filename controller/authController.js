@@ -184,7 +184,7 @@ async function logout(req, res) {
 async function profile(req, res) {
     try {
         // var currentUser = req.session.user;
-        var user = await UserModel.findOne({ _id: req.payload._id }, { 'firstName': 1, 'lastName': 1, 'email': 1, 'mobile': 1, 'expertise': 1, 'language': 1, 'title': 1, 'description': 1, 'workHistory': 1, 'location': 1, 'savedJob': 1, 'rate': 1, 'img': 1 });
+        var user = await UserModel.findOne({ _id: req.payload._id }, { 'type': 1, 'firstName': 1, 'lastName': 1, 'email': 1, 'mobile': 1, 'expertise': 1, 'language': 1, 'title': 1, 'description': 1, 'workHistory': 1, 'location': 1, 'savedJob': 1, 'rate': 1, 'img': 1 });
         var createLink = "http://127.0.0.1:4000" + user.img;
         var reviews = await reviewsModel.find({ userId: req.payload._id });
         var avarageReview = 0;
@@ -271,10 +271,6 @@ async function update(req, res) {
                 });
             }
         }
-
-
-
-
 
         var user1 = await UserModel.updateOne({ _id: userId }, data);
 
