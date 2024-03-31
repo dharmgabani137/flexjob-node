@@ -211,6 +211,9 @@ async function update(req, res) {
     try {
         const userId = req.payload._id;
         var data = req.body;
+        if (typeof (data?.expertise) == 'string') {
+            data.expertise = [data.expertise];
+        }
         console.log(data);
         const schema = joi.object().keys({
             firstName: joi.string().alphanum().min(3).max(30),
@@ -258,7 +261,7 @@ async function update(req, res) {
                 data.img = img
             }
             var findUser = await UserModel.findOne({ _id: req.payload._id });
-            if (findUser.img) {
+            if (findUser.img && findUser.img !== '/avatar.jpg' && findUser.img !== '/avtar.jpg') {
                 fs.unlink('./public' + findUser.img, (err) => {
                     if (err) {
                         console.error(err);
@@ -338,7 +341,7 @@ async function forgetPass(req, res) {
         if (!user)
             return res.status(400).json({
                 message: "user with given email doesn't exist",
-                status : false
+                status: false
             });
 
         let token = await tokenModel.findOne({ userId: user._id });
