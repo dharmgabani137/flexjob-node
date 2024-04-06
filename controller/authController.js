@@ -303,8 +303,8 @@ async function sendEmail(email, subject, text) {
             // service: process.env.SERVICE,
             port: 2525,
             auth: {
-                user: "aad4eed98d6747",
-                pass: "9ad860e39d32be",
+                user: "b76b91e1e7a147",
+                pass: "e1e9ec0e05dd59",
             },
         });
         await transporter.sendMail({

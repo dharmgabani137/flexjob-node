@@ -9,7 +9,7 @@ var MongoDBStore = require('connect-mongodb-session')(session);
 const cors = require("cors");
 const fileUpload = require('express-fileupload');
 const app = express();
-const dbUrl = 'mongodb://127.0.0.1:27017/user';
+const dbUrl = 'mongodb://127.0.0.1:27017/flexJob';
 mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(session({
