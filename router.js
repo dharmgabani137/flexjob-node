@@ -130,11 +130,8 @@ route.post('/admin-logout', adminLogout);
 route.post('/update-post',adminVerify ,updatepost);
 route.get('/update-post-view', adminVerify, updatePostView);
 route.get('/create-post',createPost);
-route.post('/insert-post',insertPost);
+route.post('/insert-post',adminVerify ,insertPost);
 route.get('/payment-view',paymentView);
-
-
-
 
 
 

@@ -117,7 +117,6 @@ async function insertData(req, res) {
 
         const hashedPassword = await bcrypt.hash(data.password, 10);
         var checkEmail = await UserModel.findOne({ email: data.email });
-        if (checkEmail == null) {
             var user = await UserModel.create({
                 type: data.type,
                 firstName: data.firstName,
@@ -134,18 +133,7 @@ async function insertData(req, res) {
                 rate: data.rate,
                 // img : '/img/C:\Users\Janvi\Pictures\Screenshots'
             })
-            console.log(user);
-            res.json({
-                status: true,
-                message: 'register successfully'
-            });
-        }
-        else {
-            res.json({
-                status: false,
-                message: 'user already exists'
-            })
-        }
+            res.redirect('/table')
 
     } catch (error) {
         res.json({
@@ -225,12 +213,12 @@ async function updatepost(req, res) {
                 description: data.description,
                 title: data.title,
                 expertise: data.expertise,
-                budget: data.expertise,
+                budget: data.budget,
                 status: data.status
             });
         res.redirect('/jobs')
     } catch (error) {
-        res.json({
+        res.json({  
             status: false,
             message: error.message
         });
@@ -242,12 +230,13 @@ async function createPost(req, res) {
 }
 async function insertPost(req, res) {
     try {
-
-        var user = await PostModel.create({ userId: req.payload._id, description: data.description, title: data.title, expertise: data.expertise, budget: data.budget });
-        res.json({
-            status: true,
-            message: "created successfully"
-        })
+        var data = req.body;
+        var user = await PostModel.create({ userId : data.userId ,description: data.description, title: data.title, expertise: data.expertise, budget: data.budget });
+        // res.json({
+        //     status: true,
+        //     message: "created successfully"
+        // })
+        res.redirect('/jobs')
     } catch (error) {
         res.json({
             status: false,
