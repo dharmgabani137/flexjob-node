@@ -26,7 +26,7 @@ var proposalSchema = new mongoose.Schema({
     },
     paymentStatus :{
         type : Boolean,
-        default : "false",
+        default : false,
         require : true
     }
 })
