@@ -20,8 +20,8 @@ async function proposal(req, res) {
         // sendNotification(req.payload._id, "proposal", "new proposal");
 
         sendNotification(post.userId, {
-            message: loginUser.firstName + " Make Proposal on Your post.",
-            userId: loginUser._id
+            message: req.payload.firstName + " Make Proposal on Your post.",
+            userId: req.payload._id
         });
 
         res.json({

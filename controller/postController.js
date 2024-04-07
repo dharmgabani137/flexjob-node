@@ -5,7 +5,8 @@ const moment = require('moment');
 const UserModel = require('../models/userModels');
 const { default: mongoose } = require('mongoose');
 const e = require('express');
-const { sendNotification } = require('./notificationController')
+const { sendNotification } = require('./notificationController');
+const ProposalModel = require('../models/proposalModels');
 
 async function post(req, res) {
     try {
@@ -301,6 +302,10 @@ async function postDataById(req, res) {
             }
         ]);
 
+        var proposal = await ProposalModel.findOne({
+            postId: post[0]._id,
+            userId: req.payload._id
+        });
 
         if (!post || post.length == 0) {
             return res.json({
@@ -326,7 +331,8 @@ async function postDataById(req, res) {
             data: {
                 ...post[0], expertise: expertise,
                 formattedTime: moment(post[0]?.createdAt).fromNow(),
-                liked: post[0]?.likeBy.includes(req.payload._id)
+                liked: post[0]?.likeBy.includes(req.payload._id),
+                applied: proposal ? true : false
             },
             status: true,
         })
