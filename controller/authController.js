@@ -214,17 +214,20 @@ async function update(req, res) {
         if (typeof (data?.expertise) == 'string') {
             data.expertise = [data.expertise];
         }
+        if (typeof (data?.workHistory) == 'string') {
+            data.workHistory = [data.workHistory];
+        }
         console.log(data);
         const schema = joi.object().keys({
             firstName: joi.string().alphanum().min(3).max(30),
             lastName: joi.string().alphanum().min(3).max(30),
             // email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
-            password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
+            // password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
             mobile: joi.string().regex(/^[0-9]{10}$/),
             expertise: joi.array(),
             title: joi.string(),
             description: joi.string(),
-            // workHistory: joi.array(),
+            workHistory: joi.array(),
             image: joi.allow(),
             location: joi.string(),
             // savedJob: joi.array(),
@@ -275,7 +278,7 @@ async function update(req, res) {
         var user1 = await UserModel.updateOne({ _id: userId }, data);
 
 
-        if (user1.modifiedCount == 0) {
+        if (user1 == 0) {
             res.json({
                 status: false,
                 message: "not updated"
