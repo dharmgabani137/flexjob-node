@@ -151,6 +151,14 @@ async function proposalByUser(req, res) {
                     foreignField: "_id",
                     as: "user"
                 }
+            },
+            {
+                $lookup : { 
+                    from: "posts",
+                    localField: "postId",
+                    foreignField: "_id",
+                    as: "post"
+                }
             }
         ])
             // .limit(limitValue).skip(skipValue);
