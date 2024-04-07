@@ -11,7 +11,7 @@ const { employerData } = require('./controller/employerController');
 const { seedData, expertiseData } = require('./controller/expertiseController');
 const { reviews, reviewList } = require('./controller/reviewsController');
 const { notificationList } = require('./controller/notificationController');
-const { dashbord, loginPost, loginGet, table, adminData, createData, insertData, updateView, updateData, userDelete, userBlock, adminLogout, jobs, updatepost, updatePostView, createPost, insertPost, paymentView } = require('./controller/homeController');
+const { dashbord, loginPost, loginGet, table, adminData, createData, insertData, updateView, updateData, userDelete, userBlock, adminLogout, jobs, updatepost, updatePostView, createPost, insertPost, paymentView, adminPostDelete } = require('./controller/homeController');
 const { seed } = require('./seed/seed');
 const { createOrder, verifyOrder } = require('./controller/paymentController');
 
@@ -124,7 +124,7 @@ route.get('/create-data', adminVerify, createData);
 route.post('/insert-data', adminVerify, insertData);
 route.get('/update-view', adminVerify, updateView);
 route.post('/update-data', adminVerify, updateData);
-route.get('/post-delete', adminVerify, postDelete);
+route.get('/post-delete', adminVerify, adminPostDelete);
 route.get('/user-block', adminVerify, userBlock);
 route.post('/admin-logout', adminLogout);
 route.post('/update-post',adminVerify ,updatepost);

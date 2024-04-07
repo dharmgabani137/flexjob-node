@@ -23,6 +23,11 @@ var proposalSchema = new mongoose.Schema({
     status : {
         type : String,
         require : true
+    },
+    paymentStatus :{
+        type : Boolean,
+        default : "false",
+        require : true
     }
 })
 proposalSchema.plugin(aggregatePaginate);

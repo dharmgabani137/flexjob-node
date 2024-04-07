@@ -23,12 +23,10 @@
                             <th>email</th>
                             <th>password</th>
                             <th>mobile</th>
-                            <th>technology</th>
                             <th>title</th>
                             <th>description</th>
                             <th>workHistory</th>
                             <th>location</th>
-                            <th>savedJob</th>
                             <th>rate</th>
                             <th>img</th>
                             <th>update</th>
@@ -42,12 +40,10 @@
                             <th>email</th>
                             <th>password</th>
                             <th>mobile</th>
-                            <th>expertise</th>
                             <th>title</th>
                             <th>description</th>
                             <th>workHistory</th>
                             <th>location</th>
-                            <th>savedJob</th>
                             <th>rate</th>
                             <th>img</th>
                             <th>update</th>
@@ -69,13 +65,10 @@
                                     <%= element.email %>
                                 </td>
                                 <td>
-                                    <%= element.password %>
+                                    <%= element.password?.slice(0,10) %>...
                                 </td>`
                                 <td>
                                     <%= element.mobile %>
-                                </td>
-                                <td>
-                                    <%= element.expertise %>
                                 </td>
                                 <td>
                                     <%= element.title %>
@@ -90,13 +83,11 @@
                                     <%= element.location %>
                                 </td>
                                 <td>
-                                    <%= element.savedJob %>
-                                </td>
-                                <td>
                                     <%= element.rate %>
                                 </td>
                                 <td>
-                                    <%= element.img %>
+                                    <img src= <%= element.img %> alt="" height="80px" width="80px">
+                                   
                                 </td>
                                 <td>
 

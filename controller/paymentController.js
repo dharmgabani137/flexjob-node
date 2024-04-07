@@ -65,6 +65,7 @@ async function verifyOrder(req, res) {
         var updateStatus = await paymentModel.updateOne({ order_id: order_id }, {
             status: "completed"
         });
+        var proposalUpdate = await ProposalModel.updateOne({_id : updateStatus.proposalId},{paymentStatus : "true"})
         res.json({ success: true, message: "Payment has been verified" })
     }
     else

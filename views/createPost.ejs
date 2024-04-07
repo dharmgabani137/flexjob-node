@@ -28,8 +28,17 @@
                                     </div>
                                     <form action="/insert-post" method="post">
                                         <div class="form-group">
-                                            <input type="text" name="userId" class="form-control form-control-user"
-                                                placeholder="Enter userId">
+                                            <!-- <input type="text" name="userId" class="form-control form-control-user"
+                                                placeholder="Enter userId"> -->
+                                            <select name="userId" class="form-control">
+                                                <option value="" disabled>Select User</option>
+                                                <% user.forEach(element=> { %>
+                                                    
+                                                    <option value="<%= element._id %>">
+                                                        <%= element.firstName %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
                                         </div>
                                         <div class="form-group">
                                             <input type="text" name="description" class="form-control form-control-user"

@@ -95,7 +95,7 @@ async function jobs(req, res) {
 
         })
     })))
-    console.log(newD);
+    
     res.render('jobs', { newD })
 }
 async function createData(req, res) {
@@ -117,23 +117,23 @@ async function insertData(req, res) {
 
         const hashedPassword = await bcrypt.hash(data.password, 10);
         var checkEmail = await UserModel.findOne({ email: data.email });
-            var user = await UserModel.create({
-                type: data.type,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                email: data.email,
-                password: hashedPassword,
-                mobile: data.mobile,
-                //       //  // language: data.language,
-                title: data.title,
-                description: data.description,
-                // workHistory: data.workHistory,
-                location: data.location,
-                // savedJob: data.savedJob,
-                rate: data.rate,
-                // img : '/img/C:\Users\Janvi\Pictures\Screenshots'
-            })
-            res.redirect('/table')
+        var user = await UserModel.create({
+            type: data.type,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            password: hashedPassword,
+            mobile: data.mobile,
+            //       //  // language: data.language,
+            title: data.title,
+            description: data.description,
+            // workHistory: data.workHistory,
+            location: data.location,
+            // savedJob: data.savedJob,
+            rate: data.rate,
+            // img : '/img/C:\Users\Janvi\Pictures\Screenshots'
+        })
+        res.redirect('/table')
 
     } catch (error) {
         res.json({
@@ -148,6 +148,7 @@ async function updateView(req, res) {
 
     var user = await UserModel.findOne({ _id: req.query.id });
     res.render('updateview', { user })
+    
 }
 async function updateData(req, res) {
     try {
@@ -168,6 +169,7 @@ async function updateData(req, res) {
             // savedJob: data.savedJob,
             rate: data.rate,
         })
+        
         res.redirect('/table')
     } catch (error) {
         res.json({
@@ -195,7 +197,7 @@ async function adminLogout(req, res) {
     res.redirect('/login-admin')
 }
 // --------------------------------------------------------------------------------------------------------------------------
-async function postDelete(req, res) {
+async function adminPostDelete(req, res) {
     var deleteUser = await PostModel.deleteOne({ _id: req.query.id });
     console.log(deleteUser);
     res.redirect('/jobs')
@@ -212,13 +214,13 @@ async function updatepost(req, res) {
             {
                 description: data.description,
                 title: data.title,
-                expertise: data.expertise,
+                // expertise: data.expertise,
                 budget: data.budget,
-                status: data.status
             });
+            console.log(data.id);
         res.redirect('/jobs')
     } catch (error) {
-        res.json({  
+        res.json({
             status: false,
             message: error.message
         });
@@ -226,12 +228,14 @@ async function updatepost(req, res) {
 
 }
 async function createPost(req, res) {
-    res.render('createPost')
+    var user = await UserModel.find({});
+    res.render('createPost',{user})
 }
 async function insertPost(req, res) {
     try {
         var data = req.body;
-        var user = await PostModel.create({ userId : data.userId ,description: data.description, title: data.title, expertise: data.expertise, budget: data.budget });
+        var user = await PostModel.create({ userId : data.userId,description: data.description, title: data.title, budget: data.budget });
+        console.log(data);
         // res.json({
         //     status: true,
         //     message: "created successfully"
@@ -246,7 +250,7 @@ async function insertPost(req, res) {
 
 }
 //---------------------------------------------------------------------------------------------
-async function paymentView(req,res) {
+async function paymentView(req, res) {
     const payment = await paymentModel.aggregate([
         // { $match: { postId: new mongoose.Types.ObjectId(req.query.postId) } },
         {
@@ -258,8 +262,8 @@ async function paymentView(req,res) {
             }
         }
     ])
-   
-    res.render('paymentView',{user: payment})
+    console.log(payment[0]);
+    res.render('paymentView', { user: payment })
 }
 
 
@@ -274,7 +278,7 @@ module.exports = {
     insertData,
     updateView,
     updateData,
-    postDelete,
+    adminPostDelete,
     userBlock,
     adminLogout,
     jobs,
