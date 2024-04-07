@@ -15,11 +15,18 @@ async function proposal(req, res) {
         })
         var valid = schema.validate(data);
 
-        var user = await ProposalModel.create({ postId: data.postId, userId: req.payload._id, description: data.description, bidAmount: data.bidAmount, status: data.status });
-        sendNotification(req.payload._id, "proposal", "new proposal");
+        var proposal = await ProposalModel.create({ postId: data.postId, userId: req.payload._id, description: data.description, bidAmount: data.bidAmount, status: data.status });
+        var post = await PostModel.findById(proposal.postId);
+        // sendNotification(req.payload._id, "proposal", "new proposal");
+
+        sendNotification(post.userId, {
+            message: req.payload.firstName + " Make Proposal on Your post.",
+            userId: req.payload._id
+        });
+
         res.json({
             status: true,
-            message: "created successfully"
+            message: "proposal created successfully"
         })
     } catch (error) {
         res.json({
@@ -143,6 +150,14 @@ async function proposalByUser(req, res) {
                     localField: "userId",
                     foreignField: "_id",
                     as: "user"
+                }
+            },
+            {
+                $lookup : { 
+                    from: "posts",
+                    localField: "postId",
+                    foreignField: "_id",
+                    as: "post"
                 }
             }
         ])

@@ -96,7 +96,7 @@ route.get('/proposal-by-user', proposalByUser);
 route.post('/like', verify, likePost);
 route.post('/save-post', verify, savePost);
 route.post('/reviews', verify, reviews);
-route.get('/notification-list', notificationList);
+route.get('/notification-list', verify,notificationList);
 route.get('/user-by-id/:id', employeeDataById);
 route.get('/review-list', verify, reviewList);
 route.get('/save-job-list', verify, saveJobList)
