@@ -1,17 +1,14 @@
 const notificationModel = require('../models/notificationModel');
-async function sendNotification(userId, type, message) {
+async function sendNotification(userId, data) {
     var notification = await notificationModel.create({
         userId: userId,
-        data: {
-            type: type,
-            message: message
-        },
+        data: data,
         isRead: false
     })
 }
 
 async function notificationList(req, res) {
-    var userId = req.query.userId;
+    var userId = req.payload._id;
     var user = await notificationModel.find({ userId: userId });
     res.json({
         status: true,

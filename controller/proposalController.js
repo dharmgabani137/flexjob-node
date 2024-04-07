@@ -15,11 +15,18 @@ async function proposal(req, res) {
         })
         var valid = schema.validate(data);
 
-        var user = await ProposalModel.create({ postId: data.postId, userId: req.payload._id, description: data.description, bidAmount: data.bidAmount, status: data.status });
-        sendNotification(req.payload._id, "proposal", "new proposal");
+        var proposal = await ProposalModel.create({ postId: data.postId, userId: req.payload._id, description: data.description, bidAmount: data.bidAmount, status: data.status });
+        var post = await PostModel.findById(proposal.postId);
+        // sendNotification(req.payload._id, "proposal", "new proposal");
+
+        sendNotification(post.userId, {
+            message: loginUser.firstName + " Make Proposal on Your post.",
+            userId: loginUser._id
+        });
+
         res.json({
             status: true,
-            message: "created successfully"
+            message: "proposal created successfully"
         })
     } catch (error) {
         res.json({

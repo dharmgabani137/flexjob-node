@@ -5,7 +5,7 @@ const moment = require('moment');
 const UserModel = require('../models/userModels');
 const { default: mongoose } = require('mongoose');
 const e = require('express');
-const {sendNotification} = require('./notificationController')
+const { sendNotification } = require('./notificationController')
 
 async function post(req, res) {
     try {
@@ -199,18 +199,18 @@ async function likePost(req, res) {
     try {
         var data = req.body;
         var loginUser = req.payload;
-        var findUser = await PostModel.findOne({ _id: data.postId });
-        if (!findUser) {
+        var post = await PostModel.findOne({ _id: data.postId });
+        if (!post) {
             res.json({
                 status: false,
                 message: "post not found"
             })
         }
-        if (findUser.likeBy.includes(loginUser._id)) {
-            const index = findUser.likeBy.indexOf(loginUser._id);
-            findUser.likeBy.splice(index, 1);
-            findUser.save();
-            sendNotification(req.payload._id,"dislike","unlike");
+        if (post.likeBy.includes(loginUser._id)) {
+            const index = post.likeBy.indexOf(loginUser._id);
+            post.likeBy.splice(index, 1);
+            post.save();
+            // sendNotification(req.payload._id, "dislike", "unlike");
             res.json({
                 status: true,
                 like: false,
@@ -218,9 +218,12 @@ async function likePost(req, res) {
             })
         }
         else {
-            findUser.likeBy.push(loginUser._id);
-            findUser.save();
-            sendNotification(req.payload._id,"like","like");
+            post.likeBy.push(loginUser._id);
+            post.save();
+            sendNotification(post.userId, {
+                message: loginUser.firstName + " Liked Your Post.",
+                userId: loginUser._id
+            });
             res.json({
                 status: true,
                 like: true,
@@ -251,7 +254,7 @@ async function savePost(req, res) {
             const index = user.savedJob.indexOf(loginUser._id);
             user.savedJob.splice(index, 1);
             user.save();
-            sendNotification(req.payload._id,"unsaved","removed");
+            // sendNotification(req.payload._id, "unsaved", "removed");
             res.json({
                 status: true,
                 save: false,
@@ -261,7 +264,7 @@ async function savePost(req, res) {
         else {
             user.savedJob.push(data.postId);
             user.save();
-            sendNotification(req.payload._id,"save","saved");
+            // sendNotification(req.payload._id, "save", "saved");
             res.json({
                 status: true,
                 save: true,
